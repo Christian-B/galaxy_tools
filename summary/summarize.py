@@ -1,0 +1,87 @@
+from optparse import OptionParser, OptionGroup
+import sys
+
+def summerize(input_path, output_path, seperator):
+    print "Summerizing ", input_path, "to", output_path
+    line_count = 0;
+    with open(input_path, 'r') as input_file:
+        header = input_file.readline().strip()
+        parts = header.split(seperator)
+        number_of_columns = len(parts)
+        sums = [0 for i in range(number_of_columns)]
+        isInteger = [True for i in range(number_of_columns)]
+        line_count == 0    
+        for line in input_file:
+            line_count+=1
+            for (col, st) in enumerate(line.strip().split("\t")):    
+                if isInteger[col]:
+                    try:
+                        sums[col]+= int(st)
+                    except ValueError:
+                        isInteger[col] = False
+    hasHeader = False
+    headers = header.split(seperator)
+    for (col, st) in enumerate(headers):
+        if isInteger[col]:
+            try:
+                test = int(st)
+            except ValueError:
+                hasHeader = True
+    if not hasHeader:                             
+        for (col, st) in enumerate(headers):    
+            if isInteger[col]:
+                sums[col]+= int(st)
+        line_count+=1
+    with open(output_path, 'w') as output_file:
+        line = ["Column","Sum","Average"]
+        output_file.write("\t".join(line) + "\n")
+        for (col, asum) in enumerate(sums):    
+            line = []
+            if hasHeader:
+                line.append(headers[col])
+            else:
+                line.append("column " + str(col) + ":")
+            if isInteger[col]:
+                line.append(str(sums[col]))
+                line.append(str(sums[col]/float(line_count)))
+            else:
+                line.append("not int")
+                line.append("")
+            output_file.write("\t".join(line) + "\n")
+        
+if __name__ == '__main__':
+    usage = "usage: %prog [options] INPUT_FILE"
+    # define options
+    parser = OptionParser(usage=usage)
+    parser.add_option("-o", "--output", dest="output_path", help="Path to file, where the output should be written. Defaults to summary.tsv", default="summary.tsv")
+    group = OptionGroup(parser, "Seperator Options",
+                    "Specifes the Seperator to used to split columns. "
+                    "Defaults to tab. "
+                    "Only one Seperator option can be provided.")
+    group.add_option("-a", "--ascii_seperator", dest="ascii_seperator", help="ASCii code of seperator")
+    group.add_option("-s", "--seperator", dest="seperator", help="Column seperator as character.")
+    parser.add_option_group(group)
+
+    # parse
+    options, args = parser.parse_args()
+
+    #Check exactly one input_file specified
+    if len(args) < 1:
+        parser.error("ERROR! No INPUT_FILE specified.")   
+    elif len(args) > 1:
+        parser.error("ERROR! No INPUT_FILE specified.")   
+ 
+    #Get and check the column seperator
+    if options.ascii_seperator:
+        if options.seperator:
+            parser.error("options -a and -b are mutually exclusive")
+        else:
+            seperator = chr(int(options.ascii_seperator))  
+    else:
+        if options.seperator:
+            seperator = options.seperator
+        else:
+            seperator = "\t"
+    
+    summerize(args[0], options.output_path, seperator)
+
