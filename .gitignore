@@ -1,6 +1,9 @@
 #gedit temp files
 *~
 
+#Lock files
+*~lock*
+
 #Files written by tests
 summary/summary.tsv
-frequency/frequency.tsv
+frequency/counts.tsv
