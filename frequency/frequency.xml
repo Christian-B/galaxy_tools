@@ -1,0 +1,30 @@
+<tool id="brenninc_frequency" name="Count Frequencies in File" version="0.1.beta">
+  <description>Frequency</description>
+  <command interpreter="python">frequency.py --maxoptions=${max_options} --ascii_seperator=${seperator} --output=${output} $header $input</command>
+  <inputs>
+    <param format="tabular" name="input" type="data" label="Source file"/>
+    <param name="max_options" size="4" type="integer" value="10" label="Maximum different values per column to show" />
+    <param name="seperator" type="select" label="Character on which to seperate" help="Data is split into columns with a new column started every time this character is found.">
+            <option value="9">Tab</option>
+            <option value="44">, (Comma)</option>
+            <option value="46">. (FullStop)</option>
+    </param>
+    <param name="header" type="boolean" label="File Has column Header" truevalue="--header" falsevalue=""/>
+
+  </inputs>
+  <outputs>
+    <data format="tabular" name="output" />
+  </outputs>
+
+  <tests>
+    <test>
+      <param name="input" value="input.tsv"/>
+      <output name="output" file="output.tsv"/>
+    </test>
+  </tests>
+
+  <help>
+Frequency counter tool for column based input file.
+  </help>
+
+</tool>
