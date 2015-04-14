@@ -4,9 +4,7 @@ import sys
 def summerize(input_path, output_path, seperator, has_header):
         
     def processLine(line):
-        print line
         for (col, st) in enumerate(line.strip().split(seperator)): 
-            print col, st
             if st:
                 counts[col]+= 1
                 if not types[col]:
