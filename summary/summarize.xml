@@ -1,4 +1,4 @@
-<tool id="brenninc_summerize" name="Summarize File" version="0.0.1">
+<tool id="brenninc_summerize" name="Summarize File" version="0.1.beta">
   <description>Summarization</description>
   <command interpreter="python">summarize.py --ascii_seperator=${seperator} --output=${output} $header $input</command>
   <inputs>

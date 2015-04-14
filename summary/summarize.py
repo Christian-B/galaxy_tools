@@ -60,7 +60,7 @@ def summerize(input_path, output_path, seperator, has_header):
     with open(output_path, 'w') as output_file:
         line = ["Column","Type","count","Min","Max","Sum","Average"]
         output_file.write("\t".join(line) + "\n")
-        for (col, asum) in enumerate(sums):    
+        for col in range(number_of_columns):    
             line = []
             if has_header:
                 line.append(headers[col])
