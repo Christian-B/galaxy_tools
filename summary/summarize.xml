@@ -1,6 +1,6 @@
 <tool id="brenninc_summerize" name="Summarize File" version="0.0.1">
   <description>Summarization</description>
-  <command interpreter="python">summarize.py --ascii_seperator=${seperator} --output=${output} $input</command>
+  <command interpreter="python">summarize.py --ascii_seperator=${seperator} --output=${output} $header $input</command>
   <inputs>
     <param format="tabular" name="input" type="data" label="Source file"/>
     <param name="seperator" type="select" label="Character on which to seperate" help="Data is split into columns with a new column started every time this character is found.">
@@ -8,6 +8,8 @@
             <option value="44">, (Comma)</option>
             <option value="46">. (FullStop)</option>
     </param>
+    <param name="header" type="boolean" label="File Has column Header" truevalue="--header" falsevalue=""/>
+
   </inputs>
   <outputs>
     <data format="tabular" name="output" />

@@ -1,49 +1,47 @@
 from optparse import OptionParser, OptionGroup
 import sys
 
-def summerize(input_path, output_path, seperator):
-    print "Summerizing ", input_path, "to", output_path
-    line_count = 0;
-    with open(input_path, 'r') as input_file:
-        header = input_file.readline().strip()
-        parts = header.split(seperator)
-        number_of_columns = len(parts)
-        sums = [0 for i in range(number_of_columns)]
-        isInteger = [True for i in range(number_of_columns)]
-        line_count == 0    
-        for line in input_file:
-            line_count+=1
-            for (col, st) in enumerate(line.strip().split("\t")):    
+def summerize(input_path, output_path, seperator, has_header):
+        
+    def processLine(line):
+        for (col, st) in enumerate(line.strip().split(seperator)): 
+            if st:
+                counts[col]+= 1
                 if isInteger[col]:
                     try:
                         sums[col]+= int(st)
                     except ValueError:
                         isInteger[col] = False
-    hasHeader = False
-    headers = header.split(seperator)
-    for (col, st) in enumerate(headers):
-        if isInteger[col]:
-            try:
-                test = int(st)
-            except ValueError:
-                hasHeader = True
-    if not hasHeader:                             
-        for (col, st) in enumerate(headers):    
-            if isInteger[col]:
-                sums[col]+= int(st)
-        line_count+=1
+
+    print "Summarizing ", input_path, "to", output_path
+
+    with open(input_path, 'r') as input_file:
+        header = input_file.readline().strip()
+        parts = header.split(seperator) 
+        number_of_columns = len(parts)
+        counts = [0 for i in range(number_of_columns)]
+        sums = [0 for i in range(number_of_columns)]
+        isInteger = [True for i in range(number_of_columns)]
+        if has_header:
+            headers = parts
+        else:
+            processLine(header)
+        for line in input_file:
+            processLine(line)
+
     with open(output_path, 'w') as output_file:
-        line = ["Column","Sum","Average"]
+        line = ["Column","count","Sum","Average"]
         output_file.write("\t".join(line) + "\n")
         for (col, asum) in enumerate(sums):    
             line = []
-            if hasHeader:
+            if has_header:
                 line.append(headers[col])
             else:
                 line.append("column " + str(col) + ":")
+            line.append(str(counts[col]))
             if isInteger[col]:
                 line.append(str(sums[col]))
-                line.append(str(sums[col]/float(line_count)))
+                line.append(str(sums[col]/float(counts[col])))
             else:
                 line.append("not int")
                 line.append("")
@@ -53,7 +51,11 @@ if __name__ == '__main__':
     usage = "usage: %prog [options] INPUT_FILE"
     # define options
     parser = OptionParser(usage=usage)
-    parser.add_option("-o", "--output", dest="output_path", help="Path to file, where the output should be written. Defaults to summary.tsv", default="summary.tsv")
+    parser.add_option("-o", "--output", dest="output_path", 
+                      help="Path to file, where the output should be written. Defaults to summary.tsv", 
+                      default="summary.tsv")
+    parser.add_option("--header", action="store_true", dest="has_header",
+                      help="Considers the first line a header line. Default is no header.")
     group = OptionGroup(parser, "Seperator Options",
                     "Specifes the Seperator to used to split columns. "
                     "Defaults to tab. "
@@ -69,7 +71,7 @@ if __name__ == '__main__':
     if len(args) < 1:
         parser.error("ERROR! No INPUT_FILE specified.")   
     elif len(args) > 1:
-        parser.error("ERROR! No INPUT_FILE specified.")   
+        parser.error("ERROR! Multiple values for INPUT_FILE found.")   
  
     #Get and check the column seperator
     if options.ascii_seperator:
@@ -83,5 +85,5 @@ if __name__ == '__main__':
         else:
             seperator = "\t"
     
-    summerize(args[0], options.output_path, seperator)
+    summerize(args[0], options.output_path, seperator, options.has_header)
 
