@@ -1,2 +1,6 @@
 #gedit temp files
 *~
+
+#Files written by tests
+summary/summary.tsv
+
