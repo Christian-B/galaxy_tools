@@ -4,14 +4,40 @@ import sys
 def summerize(input_path, output_path, seperator, has_header):
         
     def processLine(line):
+        print line
         for (col, st) in enumerate(line.strip().split(seperator)): 
+            print col, st
             if st:
                 counts[col]+= 1
-                if isInteger[col]:
+                if not types[col]:
+                    types[col] = "int"
+                    st_maxs[col] = st
+                    st_mins[col] = st
+                    first = True
+                else:    
+                    first = False
+                    if (st > st_maxs[col]):
+                        st_maxs[col] = st
+                    if (st < st_mins[col]):
+                        st_mins[col] = st
+                if types[col] == "int":
                     try:
-                        sums[col]+= int(st)
+                        value = int(st)
+                        print value
                     except ValueError:
-                        isInteger[col] = False
+                        types[col] = "float"
+                if types[col] == "float":
+                    try:
+                        value= float(st)
+                    except ValueError:
+                        types[col] = "string"
+                if types[col] != "string":
+                    sums[col]+= value
+                    if first or (value > maxs[col]):
+                         maxs[col] = value
+                    if first or (value < mins[col]):
+                         mins[col] = value
+                        
 
     print "Summarizing ", input_path, "to", output_path
 
@@ -21,7 +47,11 @@ def summerize(input_path, output_path, seperator, has_header):
         number_of_columns = len(parts)
         counts = [0 for i in range(number_of_columns)]
         sums = [0 for i in range(number_of_columns)]
-        isInteger = [True for i in range(number_of_columns)]
+        st_maxs = [None for i in range(number_of_columns)]
+        st_mins = [None for i in range(number_of_columns)]
+        maxs = [None for i in range(number_of_columns)]
+        mins = [None for i in range(number_of_columns)]
+        types = [None for i in range(number_of_columns)]
         if has_header:
             headers = parts
         else:
@@ -30,7 +60,7 @@ def summerize(input_path, output_path, seperator, has_header):
             processLine(line)
 
     with open(output_path, 'w') as output_file:
-        line = ["Column","count","Sum","Average"]
+        line = ["Column","Type","count","Min","Max","Sum","Average"]
         output_file.write("\t".join(line) + "\n")
         for (col, asum) in enumerate(sums):    
             line = []
@@ -38,13 +68,18 @@ def summerize(input_path, output_path, seperator, has_header):
                 line.append(headers[col])
             else:
                 line.append("column " + str(col) + ":")
+            line.append(types[col])
             line.append(str(counts[col]))
-            if isInteger[col]:
+            if types[col] == "string":
+                line.append(st_mins[col])
+                line.append(st_maxs[col])
+                line.append("not numerical")
+                line.append("")
+            else:
+                line.append(str(mins[col]))
+                line.append(str(maxs[col]))
                 line.append(str(sums[col]))
                 line.append(str(sums[col]/float(counts[col])))
-            else:
-                line.append("not int")
-                line.append("")
             output_file.write("\t".join(line) + "\n")
         
 if __name__ == '__main__':
