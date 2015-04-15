@@ -1,0 +1,22 @@
+<tool id="brenninc_fasta_length" name="Get Length and frequenct of Fasta" version="0.1.beta">
+  <description>Summary</description>
+  <command interpreter="python">lengths.py --output=${output} $input</command>
+  <inputs>
+    <param format="fasta" name="input" type="data" label="Source file"/>
+  </inputs>
+  <outputs>
+    <data format="tabular" name="output" />
+  </outputs>
+
+  <tests>
+    <test>
+      <param name="input" value="small.fasta"/>
+      <output name="output" file="Length.tsv"/>
+    </test>
+  </tests>
+
+  <help>
+Summary tool for Fasta fiie.
+  </help>
+
+</tool>
