@@ -7,3 +7,4 @@
 #Files written by tests
 summary/summary.tsv
 frequency/counts.tsv
+fasta/lengths.tsv
