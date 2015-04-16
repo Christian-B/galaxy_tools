@@ -2,27 +2,18 @@
   <description>Summarization</description>
   <command interpreter="python">
     #if $rows.option =="all"
-        #set $header = -1
-        #set $data_start = 0
+        summarize.py --ascii_seperator=${seperator} --output=${output} $input
     #elif $rows.option =="header"
-        #set $header = 0
-        #set $data_start = 0
+        summarize.py --ascii_seperator=${seperator} --output=${output} --header=0 $input
     #elif $rows.option =="header_ignore"
-        #set $header = 0
-        #set $data_start = int(str($rows.ignore)) + 1
+        summarize.py --ascii_seperator=${seperator} --output=${output} --header=0 --data_start=${rows.data_start} $input
     #elif $rows.option =="ignore"
-        #set $header = -1
-        #set $data_start = $rows.ignore 
+        summarize.py --ascii_seperator=${seperator} --output=${output} --data_start=${rows.data_start} $input
     #elif  $rows.option =="ignore_header"
-        #set $header = $rows.ignore
-        #set $data_start = int(str($rows.ignore)) + 1
+        summarize.py --ascii_seperator=${seperator} --output=${output} --header=${rows.data_start} --data_start=${rows.data_start} $input
     #else
-        #set $header = $rows.header
-        #set $data_start = $rows.data_start
+        summarize.py --ascii_seperator=${seperator} --output=${output} --header=${rows.header} --data_start=${rows.data_start} $input
     #end if
-    summarize.py --ascii_seperator=${seperator} --output=${output} --header=${header} --data_start=${data_start} $input
-
-
   </command>
   <inputs>
     <param format="tabular" name="input" type="data" label="Source file"/>
@@ -41,13 +32,10 @@
             <option value="configure">User Configuarable setup</option>
         </param>
         <when value="header_ignore">
-            <param name="ignore" size="4" type="integer" value="1" label="Number of lines below header to ignore" />
+            <param name="data_start" size="4" type="integer" value="1" label="Number of lines below header to ignore" />
         </when>
-        <when value="ignore_header">
-            <param name="ignore" size="4" type="integer" value="1" label="Number of lines above header to ignore" />
-        </when>
-        <when value="ignore">
-            <param name="ignore" size="4" type="integer" value="1" label="Number of lines to ignore. (No Header)" />
+        <when value="header_ignore">
+            <param name="data_start" size="4" type="integer" value="1" label="Number of lines above header to ignore" />
         </when>
         <when value="configure">
             <param name="header" size="4" type="integer" value="0" label="Header Row (top row is 0)" />
