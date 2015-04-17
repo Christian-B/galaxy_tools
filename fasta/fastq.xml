@@ -1,0 +1,22 @@
+<tool id="brenninc_fastq_stats" name="Get Stats and frequenct of Fastq" version="0.1.beta">
+  <description>Summary</description>
+  <command interpreter="python">fastq.py --output=${output} $input</command>
+  <inputs>
+    <param format="fastq" name="input" type="data" label="Source file"/>
+  </inputs>
+  <outputs>
+    <data format="tabular" name="output" />
+  </outputs>
+
+  <tests>
+    <test>
+      <param name="input" value="small.fastq"/>
+      <output name="output" file="Length.tsv"/>
+    </test>
+  </tests>
+
+  <help>
+Summary tool for Fasta fiie.
+  </help>
+
+</tool>
