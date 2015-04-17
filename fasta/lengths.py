@@ -58,9 +58,21 @@ def summary(input_path, output_path):
                 if fasta:
                     summaries.append(FastaSummary(fasta))
                 fasta = Fasta(stripped[1:])
+            elif stripped.startswith(";"):    
+                if fasta:
+                    if len(fasta.sequence) > 0:
+                        summaries.append(FastaSummary(fasta))
+                        fasta = Fasta(stripped[1:])
+                    #else ignore second comment line    
+                else:        
+                    fasta = Fasta(stripped[1:])
+            
             else:
                 fasta.addSequenceLine(stripped)
- 
+    
+        #save last one            
+        summaries.append(FastaSummary(fasta))
+        
     allCount = Counter()
     for summary in summaries:
         allCount.update(summary.counter)
