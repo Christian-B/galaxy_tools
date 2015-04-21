@@ -1,5 +1,6 @@
 from collections import Counter, OrderedDict
 from optparse import OptionParser, OptionGroup
+import re
 import sys
      
 #Based on https://samtools.github.io/hts-specs/SAMv1.pdf     
@@ -26,7 +27,9 @@ sequence_dictionary = OrderedDict()
 class Sequence:
     def __init__(self, line_number, line):
         global _counterKeys
-        self.counter = Counter()
+        self.sequence_counter = Counter()
+        self.quality_counter = Counter()
+        self.cigar_counter = Counter()
         self.length = None
         self.count = 0
         self.max_mapq = None
@@ -60,14 +63,16 @@ class Sequence:
             if not self.length:    
                 print >> sys.stderr, "Line", line_number, "has a sequence('@SQ') with no length('LN:')"
                 print >> sys.stderr, "Found",line
-                sys.exit(1)
+                sys.exit(1)    
         else:
             self.name = line
-            self.keys = None
+            _sequence_counter_keys = None
             
     def addAlignment(self, alignment):
         self.count += 1
-        self.counter.update(alignment.seq)
+        self.sequence_counter.update(alignment.seq)
+        self.quality_counter.update(alignment.qual)
+        self.cigar_counter.update(alignment.cigar_long)
         if self.max_mapq:
             if self.max_mapq < alignment.mapq:
                 self.max_mapq = alignment.mapq       
@@ -79,30 +84,69 @@ class Sequence:
         if self != _all_sequence:
             _all_sequence.addAlignment(alignment)               
         else:
-            _counterKeys = None
+            _sequence_keys = None
 
     def __str__(self):
-        reply = str(self.count) + "\t" 
-        reply += str(self.min_mapq) + "\t" + str(self.max_mapq)
-        for key in counterKeys():            
-            reply+= "\t" + str(self.counter[key]) 
-        reply += "\t" + self.name 
+        reply = str(self.count) 
+        reply+=  "\t" 
+        reply+= str(self.min_mapq) 
+        reply+= "\t" 
+        reply+= str(self.max_mapq)
+        for key in sequenceKeys():            
+            reply+= "\t"
+            reply+= str(self.sequence_counter[key]) 
+        reply+= "\t" 
+        reply+= str(sum(self.sequence_counter.values()) )  
+        for key in qualityKeys():            
+            reply+= "\t"
+            reply+= str(self.quality_counter[key]) 
+        reply+= "\t" 
+        reply+= str(sum(self.quality_counter.values()))   
+        for key in cigarKeys():            
+            reply+= "\t"
+            reply+= str(self.cigar_counter[key]) 
+        reply+= "\t" 
+        reply+= str(sum(self.cigar_counter.values()))   
+        reply+= "\t" 
+        reply+= self.name 
         return reply      
 
 _all_sequence =  Sequence(None, "All")  
 sequence_dictionary["*"] = Sequence(None, "Unkown")           
 
-_counterKeys  = None                         
+_sequence_keys  = None                         
+_quality_keys  = None                         
+_cigar_keys  = None                         
 
-def counterKeys():
-    global _counterKeys
-    if not _counterKeys:
-        _counterKeys = sorted(_all_sequence.counter.keys())
-    return _counterKeys
+def updateKeys():
+    global _sequence_keys, _quality_keys, _cigar_keys
+    _sequence_keys = sorted(_all_sequence.sequence_counter.keys())
+    _quality_keys = sorted(_all_sequence.quality_counter.keys())
+    _cigar_keys = sorted(_all_sequence.cigar_counter.keys())
+    
+def sequenceKeys():
+    if not _sequence_keys:
+        updateKeys()
+    return _sequence_keys
+            
+def qualityKeys():
+    if not _sequence_keys:
+        updateKeys()
+    return _quality_keys
+            
+def cigarKeys():
+    if not _sequence_keys:
+        updateKeys()
+    return _cigar_keys
             
 def strHeader():
     line = ["Count","Min Q","max Q"]
-    line.extend(counterKeys())
+    line.extend(sequenceKeys())
+    line.append("TSeq")
+    line.extend(qualityKeys())
+    line.append("TQual")
+    line.extend(cigarKeys())
+    line.append("Tcigar")
     line.append("Name")
     return "\t".join(line)  
 
@@ -167,7 +211,20 @@ class Alignment():
         self.rname = parts[2]              
         self.ps = int_value(line_number, line, "POS", parts[3], 0, 2**31-1)
         self.mapq = int_value(line_number, line, "MAPQ", parts[4], 0, 2**8-1)
+       
         self.cigar = parts[5]
+        if self.cigar != "*":
+            cigars = re.findall("[0-9]+[MIDNSHPX=]",self.cigar)
+            if len(self.cigar) != sum(len(c) for c in cigars):
+                print >> sys.stderr, "Unexpected cigar value in ", line_number, "found", self.cigar
+                print >> sys.stderr, "Found",line
+                sys.exit(1)
+            self.cigar_long = ""    
+            for cigar in cigars:
+                self.cigar_long = cigar[-1] * int(cigar[:-1])
+        else:
+            self.cigar_long = "*"    
+            
         self.pnext_name = parts[6] 
         self.pnext_possition = int_value(line_number, line, "PNEXT", parts[7], 0, 2**31-1) 
         self.tlen = int_value(line_number, line, "TLEN", parts[8], -2**31+1, 2**31-1)
@@ -182,7 +239,6 @@ class Alignment():
                 print >> sys.stderr, "Aligment line", line_number, "has an unexpected rname", self.rname
                 print >> sys.stderr, "Found",line
                 sys.exit(1)
-
 
 default_output_path = "summary.tsv"
 version = None
