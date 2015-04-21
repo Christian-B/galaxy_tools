@@ -8,3 +8,4 @@
 summary/summary.tsv
 frequency/counts.tsv
 fasta/lengths.tsv
+sam/lengths.tsv
