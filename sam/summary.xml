@@ -1,0 +1,88 @@
+<tool id="brenninc_sam_summary" name="Summarize SAM File" version="0.1.beta">
+  <description>Summarization of SAM file</description>
+  <command interpreter="python">
+    summary.py --output=${summary_output} 
+    --flag=${flag_option} 
+    #if $flag_file
+        --flag_path=${flag_ouput}
+    #end if
+    --position=${position_option} 
+    --mapq=${mapq_option} 
+    #if $mapq_file
+        --mapq_path=${mapq_ouput}
+    #end if
+    --cigar=${mapq_option} 
+    #if $cigar_file
+        --cigar_path=${cigar_ouput}
+    #end if
+    --sequence=${sequence_option} 
+    #if $sequence_file
+        --sequence_path=${sequence_ouput}
+    #end if
+    --quality=${quality_option} 
+    #if $quality_file
+        --quality_path=${quality_ouput}
+    #end if
+    $input
+  </command>
+  <inputs>
+    <param format="sam" name="input" type="data" label="Source file"/>
+    <param name="flag_option" type="select" label="Amount of flag column detail to be included">
+        <option value="Ignore" selected="true">No Flag Summary</option>
+        <option value="Summary">Only minimum and maximum flag</option>
+        <option value="Count">Count of each individaul value found in flag column</option>
+        </param>
+    <param name="flag_file" type="boolean" label="Output a seperate file with the counts of the flag column." />
+    <param name="position_option" type="select" label="Amount of Position column detail to be included">
+        <option value="Ignore" selected="true">No Position Summary</option>
+        <option value="Summary">Add minimum, maximum and average Position</option>
+        </param>
+    <param name="mapq_option" type="select" label="Amount of mapQ column detail to be included">
+        <option value="Ignore" selected="true">No mapQ Summary</option>
+        <option value="Summary">Add minimum, maximum and average mapQ</option>
+        <option value="Count">Count of each individaul value found in mapQ column</option>
+        </param>
+    <param name="mapq_file" type="boolean" label="Output a seperate file with the counts of the mapQ column." />
+    <param name="cigar_option" type="select" label="Amount of mapQ column detail to be included">
+        <option value="Ignore" selected="true">No Cigar Summary</option>
+        <option value="Summary">Only total length of Cigar</option>
+        <option value="Count">Count of each individaul value found in Cigar column</option>
+        </param>
+    <param name="cigar_file" type="boolean" label="Output a seperate file with the counts of the cigar column." />
+    <param name="sequence_option" type="select" label="Amont of sequence detail to be included">
+        <option value="Ignore" selected="true">No Sequence</option>
+        <option value="Summary">Only total length of sequences</option>
+        <option value="Count">Count of each individaul value found in sequence(s)</option>
+        </param>
+    <param name="sequence_file" type="boolean" label="Output a seperate file with the counts of the sequence column." />
+    <param name="quality_option" type="select" label="Amount of quality column detail to be included">
+        <option value="Ignore" selected="true">No quality Summary</option>
+        <option value="Summary">Only minimum and maximum quality</option>
+        <option value="Count">Count of each individaul value found in quality(ies)</option>
+        </param>
+    <param name="quality_file" type="boolean" label="Output a seperate file with the counts of the quality(ies) values." />
+  </inputs>
+  <outputs>
+    <data format="tabular" name="summary_output" label="Summary over ${input.name}"/>
+    <data format="tabular" name="flag_ouput" label="Flag Counts from ${input.name}">
+        <filter>flag_file</filter>
+        </data>    
+    <data format="tabular" name="mapq_ouput" label="MapQ Counts from ${input.name}">
+        <filter>mapq_file</filter>
+        </data>    
+    <data format="tabular" name="cigar_ouput" label="Cigar Counts from ${input.name}">
+        <filter>cigar_file</filter>
+        </data>    
+    <data format="tabular" name="sequence_ouput" label="Sequence Counts from ${input.name}">
+        <filter>sequence_file</filter>
+        </data>    
+    <data format="tabular" name="quality_ouput" label="Quality Counts from ${input.name}">
+        <filter>quality_file</filter>
+        </data>    
+  </outputs>
+
+  <help>
+Summarization tool for Sam input file.
+  </help>
+
+</tool>

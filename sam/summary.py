@@ -5,9 +5,7 @@ import sys
        
 #Based on https://samtools.github.io/hts-specs/SAMv1.pdf     
      
-default_count_sequence = False
-default_count_quality = False
-default_count_cigar = False
+default_level = "ignore"
 default_output_path = "summary.tsv"
 
 def int_value(line_number, line, tag, value, min_value, max_value):
@@ -29,12 +27,7 @@ def int_value(line_number, line, tag, value, min_value, max_value):
 
 class SamHeader():
 
-    def __init__(self,  count_sequence = default_count_sequence,      
-                count_quality = default_count_quality,
-                count_cigar = default_count_cigar):
-        self.count_sequence = count_sequence      
-        self.count_quality = count_quality
-        self.count_cigar = count_cigar
+    def __init__(self):
         self.version = None
         self.sorting_order = "unkown"
         self.grouping  = "none"
@@ -45,57 +38,53 @@ class SamHeader():
      
     def all_reference(self):
         if not self._all_reference:
-            self._all_reference = Reference(None, "All", self)
+            self._all_reference = Reference(None, "All")
         if not "*" in self.reference_dictionary:                   
-            self.reference_dictionary["*"] = Reference(None, "Unkown", self)        
+            self.reference_dictionary["*"] = Reference(None, "Unkown")        
         return self._all_reference
                     
     def update(self):
         all_reference = self.all_reference()
-        if self.count_sequence:    
-            self._sequence_keys = sorted(all_reference.sequence_counter.keys())
-        if self.count_quality:    
-            self._quality_keys = sorted(all_reference.quality_counter.keys())
-        if self.count_cigar:
-            self._cigar_keys = sorted(all_reference.cigar_counter.keys())
+        self._flag_keys = sorted(all_reference.flag_counter.keys())
+        self._cigar_keys = sorted(all_reference.cigar_counter.keys())
+        self._mapq_keys = sorted(all_reference.mapq_counter.keys())
+        self._sequence_keys = sorted(all_reference.sequence_counter.keys())
+        self._quality_keys = sorted(all_reference.quality_counter.keys())
         self._needs_updating = False
         
-    def sequenceKeys(self):
+    def flag_keys(self):
         if self._needs_updating:
             self.update()
-        return self._sequence_keys
-            
-    def qualityKeys(self):
-        if self._needs_updating:
-            self.update()
-        return self._quality_keys
-            
-    def cigarKeys(self):
+        return self._flag_keys
+
+    def cigar_keys(self):
         if self._needs_updating:
             self.update()
         return self._cigar_keys
         
-    def header_line(self):
-        line = ["Count","Min Q","max Q"]
-        if self.count_sequence:    
-            line.extend(self.sequenceKeys())
-            line.append("TSeq")
-        if self.count_quality:
-            line.extend(self.qualityKeys())
-            line.append("TQual")
-        if self.count_cigar:
-            line.extend(self.cigarKeys())    
-            line.append("Tcigar")
-        line.append("Name")
-        return "\t".join(line)  
-     
-    def addAlignment(self, alignment):
+    def mapq_keys(self):
+        if self._needs_updating:
+            self.update()
+        return self._mapq_keys
+        
+    def sequence_keys(self):
+        if self._needs_updating:
+            self.update()
+        return self._sequence_keys
+            
+    def quality_keys(self):
+        if self._needs_updating:
+            self.update()
+        return self._quality_keys
+            
+    def addAlignment(self, alignment, line_number, line):
         allreference = self.all_reference()
         if len(self.reference_dictionary) > 0:
-            reference = self.reference_dictionary[alignment.rname]
-            if reference:
+            if alignment.rname in self.reference_dictionary:
+                reference = self.reference_dictionary[alignment.rname]
                 reference.addAlignment(alignment)
             else:
+                print self.reference_dictionary.keys()
                 print >> sys.stderr, "Aligment line", line_number, "has an unexpected rname", alignment.rname
                 print >> sys.stderr, "Found",line
                 sys.exit(1)
@@ -106,7 +95,7 @@ class SamHeader():
         if line.startswith("@HD"):
             self.process_head_line(line_number, line)
         elif line.startswith("@SQ"): 
-            reference = Reference(line_number, line, self)
+            reference = Reference(line_number, line)
             self.reference_dictionary[reference.name] = reference
         elif line.startswith("@RG"): 
             print "ignoring Read Group(@RG) line"
@@ -154,26 +143,21 @@ class SamHeader():
             print >> sys.stderr, "Line", line_number, "has an unexpected @HD."
             print >> sys.stderr, "Found",line
             sys.exit(1)
-            
-    def __str__(self):
-        reply = "count_sequence: " + str(self.count_sequence)       
-        reply+= "count_quality: " + str(self.count_quality)
-        reply+= "count_cigar: " + str(self.count_cigar)
-        return reply 
-                         
+                                     
 class Reference:
-    def __init__(self, line_number, line, header=SamHeader()):
-        self.header = header
-        if self.header.count_sequence:
-            self.sequence_counter = Counter()
-        if self.header.count_quality:    
-            self.quality_counter = Counter()
-        if self.header.count_cigar:   
-            self.cigar_counter = Counter()
+    def __init__(self, line_number, line):
+        self.flag_counter = Counter()
+        self.count_position = 0       
+        self.sum_position = 0                    
+        self.max_position = 0        
+        self.min_position = 0  
+        self.mapq_counter = Counter()
+        self.cigar_count = 0                    
+        self.cigar_counter = Counter()
+        self.sequence_counter = Counter()
+        self.quality_counter = Counter()
         self.length = None
         self.count = 0
-        self.max_mapq = None
-        self.min_mapq = None
         if line_number:    
             self.name = None
             parts = line.strip().split("\t")
@@ -210,48 +194,120 @@ class Reference:
             
     def addAlignment(self, alignment):
         self.count += 1
-        if self.header.count_sequence:
-            self.sequence_counter.update(alignment.seq)
-        if self.header.count_quality:  
-            self.quality_counter.update(alignment.qual)
-        if self.header.count_cigar:   
+        self.flag_counter[alignment.flag]+=1
+        if alignment.position > 0:
+            if self.max_position:
+                if self.max_position < alignment.position:
+                    self.max_position = alignment.position       
+                if self.min_position > alignment.position:
+                    self.min_positions = alignment.position       
+                self.count_position+= 1        
+                self.sum_position+= alignment.position                    
+            else:
+                self.count_position = 1        
+                self.sum_position = alignment.position                   
+                self.max_position = alignment.position        
+                self.min_position = alignment.position                     
+        self.mapq_counter[alignment.mapq]+=1
+        if alignment.cigar_long != "*":
+            self.cigar_count+= 1
             self.cigar_counter.update(alignment.cigar_long)
-        if self.max_mapq:
-            if self.max_mapq < alignment.mapq:
-                self.max_mapq = alignment.mapq       
-            if self.min_mapq > alignment.mapq:
-                self.min_mapq = alignment.mapq       
-        else:
-            self.max_mapq = alignment.mapq        
-            self.min_mapq = alignment.mapq       
+        self.sequence_counter.update(alignment.sequence)
+        self.quality_counter.update(alignment.quality)
  
-    def __str__(self):
-        reply = str(self.count) 
-        reply+=  "\t" 
-        reply+= str(self.min_mapq) 
-        reply+= "\t" 
-        reply+= str(self.max_mapq)
-        if self.header.count_sequence:
-            for key in self.header.sequenceKeys():            
-                reply+= "\t"
-                reply+= str(self.sequence_counter[key]) 
-            reply+= "\t" 
-            reply+= str(sum(self.sequence_counter.values()) )  
-        if self.header.count_quality:  
-            for key in self.header.qualityKeys():            
-                reply+= "\t"
-                reply+= str(self.quality_counter[key]) 
-            reply+= "\t" 
-            reply+= str(sum(self.quality_counter.values()))   
-        if self.header.count_cigar:  
-            for key in self.header.cigarKeys():            
-                reply+= "\t"
-                reply+= str(self.cigar_counter[key]) 
-            reply+= "\t" 
-            reply+= str(sum(self.cigar_counter.values()))   
-        reply+= "\t" 
-        reply+= self.name 
-        return reply      
+    @staticmethod
+    def header_line(flag=False, position=False, mapq=False, cigar=False, 
+                    sequence=False, quality=False):
+        line = ["Count"]
+        if flag:
+            if flag == True:
+                line.extend(["FlagMin","FlagMax"])
+            else:
+                for key in flag:
+                    line.append(str(key))
+        if position:
+            line.extend(["#Pos","PosMin","PosMax","posAvg"])
+        if mapq:
+            line.append("#mapQ")
+            if mapq == True:
+                line.extend(["mapQMin","mapQMax","mapQAvg"])
+            else:
+                for key in mapq:
+                    line.append(str(key))
+        if cigar:
+            line.append("#cigar")
+            if cigar != True:
+                line.extend(cigar)    
+            line.append("LenCigar")
+            line.append("AvgLen")
+        if sequence:
+            if sequence != True:
+                line.extend(sequence)    
+            line.append("LenSeq")
+        if quality:
+            if quality == True:
+                line.extend(["QualMin","QualMax"])
+            else:
+                line.extend(quality)    
+            line.append("LenQual")            
+        line.append("Name")
+        return "\t".join(line)  
+     
+    def summary_line(self, flag=False, position=False, mapq=False, cigar=False, 
+                     sequence=False, quality=False):
+        line = [str(self.count)]
+        if flag:
+            if flag == True:
+                line.append(str(min(self.flag_counter)))
+                line.append(str(max(self.flag_counter)))
+            else:
+                for key in flag:
+                    line.append(str(self.flag_counter[key]))
+        if position:
+            line.append(str(self.count_position))   
+            line.append(str(self.max_position))
+            line.append(str(self.min_position))                      
+            if self.count_position == 0:
+                line.append("0")
+            else:        
+                line.append(str(self.sum_position/float(self.count_position)))
+        if mapq:
+            count = sum(self.mapq_counter.values())
+            line.append(str(count))
+            if mapq == True:
+                line.append(str(min(self.mapq_counter)))
+                line.append(str(max(self.mapq_counter)))
+                total = sum(map(lambda x: x[0] * x[1], self.mapq_counter.items()))
+                line.append(str(total/float(count)))
+            else:
+                for key in mapq:
+                    line.append(str(self.mapq_counter[key]))
+        if cigar:
+            line.append(str(self.cigar_count))
+            if cigar != True:
+                for key in cigar:
+                    line.append(str(self.cigar_counter[key]))
+            length = sum(self.cigar_counter.values())       
+            line.append(str(length))
+            if self.cigar_count > 0:
+                line.append(str(length/float(self.cigar_count)))
+            else:    
+                line.append("0")
+        if sequence:
+            if sequence != True:
+                for key in sequence:
+                    line.append(str(self.sequence_counter[key]))
+            line.append(str(sum(self.sequence_counter.values())))
+        if quality:
+            if quality == True:
+                line.append(str(min(self.quality_counter)))
+                line.append(str(max(self.quality_counter)))
+            else:    
+                for key in quality:
+                    line.append(str(self.quality_counter[key]))
+            line.append(str(sum(self.quality_counter.values())))
+        line.append(self.name)
+        return "\t".join(line)  
 
 class Program:
     def __init__(self, line_number, line):
@@ -287,7 +343,7 @@ class Program:
             sys.exit(1)
                  
 class Alignment():
-    def __init__(self, line_number, line, header = SamHeader()):
+    def __init__(self, line_number, line):
         parts = line.strip().split("\t")
         if len(parts) < 11:
             print >> sys.stderr, "Line", line_number, "has an allignnment with less than 11 columns."
@@ -295,22 +351,22 @@ class Alignment():
             sys.exit(1)
         self.qname = parts[0]    
       
-        flag = int_value(line_number, line, "FLAG", parts[1], 0, 2**16-1)
-        self.multiple_segments = flag & 1 != 0
-        self.properly_aligned = flag & 2 != 0
-        self.unmapped = flag & 4 != 0
-        self.next_unmapped = flag & 4 != 0
-        self.reverse_complemented = flag & 16 != 0  #0x10
-        self.next_reverse_complemented = flag & 32 != 0 #OX20
-        self.first_segment = flag & 64 != 0 #Ox40
-        self.last_segment = flag & 128 != 0 #Ox80
-        self.secondary = flag & 256 != 0 #Ox100
-        self.failed_quality_control = flag & 512 != 0 #Ox200
-        self.duplicate = flag & 1024 != 0 #Ox400
-        self.supplement = flag & 2048 != 0 #Ox800
+        self.flag = int_value(line_number, line, "FLAG", parts[1], 0, 2**16-1)
+        self.multiple_segments = self.flag & 1 != 0
+        self.properly_aligned = self.flag & 2 != 0
+        self.unmapped = self.flag & 4 != 0
+        self.next_unmapped = self.flag & 4 != 0
+        self.reverse_complemented = self.flag & 16 != 0  #0x10
+        self.next_reverse_complemented = self.flag & 32 != 0 #OX20
+        self.first_segment = self.flag & 64 != 0 #Ox40
+        self.last_segment = self.flag & 128 != 0 #Ox80
+        self.secondary = self.flag & 256 != 0 #Ox100
+        self.failed_quality_control = self.flag & 512 != 0 #Ox200
+        self.duplicate = self.flag & 1024 != 0 #Ox400
+        self.supplement = self.flag & 2048 != 0 #Ox800
       
         self.rname = parts[2]              
-        self.ps = int_value(line_number, line, "POS", parts[3], 0, 2**31-1)
+        self.position = int_value(line_number, line, "POS", parts[3], 0, 2**31-1)
         self.mapq = int_value(line_number, line, "MAPQ", parts[4], 0, 2**8-1)
        
         self.cigar = parts[5]
@@ -329,8 +385,8 @@ class Alignment():
         self.pnext_name = parts[6] 
         self.pnext_possition = int_value(line_number, line, "PNEXT", parts[7], 0, 2**31-1) 
         self.tlen = int_value(line_number, line, "TLEN", parts[8], -2**31+1, 2**31-1)
-        self.seq = parts[9]
-        self.qual = parts[10]
+        self.sequence = parts[9]
+        self.quality = parts[10]
         
         self.optional_fields = {}
         for optional in parts[11:]:
@@ -378,23 +434,40 @@ class Alignment():
                 print >> sys.stderr, "Line", line_number, "has an unexpected type", the_type
                 print >> sys.stderr, "Found",line
                 sys.exit(1)
-
-        #Now that we have the key information add the alignment to the summary
-        header.addAlignment(self)
     
+def processOption(parameter, name, keys):
+    if parameter.lower() == "ignore":
+        return None
+    elif parameter.lower() == "summary":
+        return True   
+    elif parameter.lower() == "count":
+        if keys:
+            return keys
+        else:    
+            print >> sys.stderr, "Count value not supperted for",name,"parameter"
+    else:
+        print >> sys.stderr, "Unexpected value for",name,"parameter. Found", parameter
+        sys.exit(1)
+
 def summary(input_path, 
             output_path=default_output_path,
-            count_sequence=default_count_sequence,
-            count_quality=default_count_quality,
-            count_cigar=default_count_cigar):
+            flag=default_level,
+            position=default_level,
+            mapq=default_level,
+            cigar=default_level,
+            sequence=default_level,
+            quality=default_level,
+            flag_path=None,
+            mapq_path=None,
+            cigar_path=None,
+            sequence_path=None,
+            quality_path=None):
 
     print "Summarizing ", input_path, "to", output_path
 
     in_header = True
-    header = SamHeader(count_sequence, count_quality, count_cigar)
-    
-    print header
-    
+    header = SamHeader()
+        
     #read data
     with open(input_path, 'r') as input_file:
         for line_number,line in enumerate(input_file):
@@ -408,46 +481,166 @@ def summary(input_path,
             else:
                 if in_header:
                     in_header == False
-                Alignment(line_number, line, header)
-                         
+                alignment = Alignment(line_number, line)
+                header.addAlignment(alignment, line_number, line)
+    
+    flag_show = processOption(flag,"flag", header.flag_keys())
+    position_show = processOption(position,"position", None)
+    mapq_show = processOption(mapq,"mapq", header.mapq_keys())
+    cigar_show = processOption(cigar,"mapq", header.cigar_keys())
+    sequence_show = processOption(sequence,"sequence", header.sequence_keys())
+    quality_show = processOption(quality,"quality", header.quality_keys())
+        
     with open(output_path, 'w') as output_file:
-        output_file.write(header.header_line())
+        output_file.write(Reference.header_line(flag=flag_show,
+                                                position=position_show,
+                                                mapq=mapq_show,
+                                                cigar=cigar_show,
+                                                sequence=sequence_show,
+                                                quality=quality_show))
         output_file.write("\n")
-        output_file.write(str(header.all_reference()))
+        output_file.write(str(header.all_reference().summary_line(flag=flag_show,
+                                                position=position_show,
+                                                mapq=mapq_show,
+                                                cigar=cigar_show,
+                                                sequence=sequence_show,
+                                                quality=quality_show)))
         output_file.write("\n")
         for key in header.reference_dictionary:
             reference = header.reference_dictionary[key]
             if reference.count > 0:
-                 output_file.write(str(reference))
+                 output_file.write(reference.summary_line(flag=flag_show,
+                                                position=position_show,
+                                                mapq=mapq_show,
+                                                cigar=cigar_show,
+                                                sequence=sequence_show,
+                                                quality=quality_show))
                  output_file.write("\n")
+                 
+    if flag_path:               
+        with open(flag_path, 'w') as output_file:
+            output_file.write(Reference.header_line(flag=header.flag_keys()))
+            output_file.write("\n")
+            output_file.write(str(header.all_reference().summary_line(flag=header.flag_keys())))
+            output_file.write("\n")
+            for key in header.reference_dictionary:
+                reference = header.reference_dictionary[key]
+                if reference.count > 0:
+                     output_file.write(reference.summary_line(flag=header.flag_keys()))
+                     output_file.write("\n")
+    if mapq_path:               
+        with open(mapq_path, 'w') as output_file:
+            output_file.write(Reference.header_line(mapq=header.mapq_keys()))
+            output_file.write("\n")
+            output_file.write(str(header.all_reference().summary_line(mapq=header.mapq_keys())))
+            output_file.write("\n")
+            for key in header.reference_dictionary:
+                reference = header.reference_dictionary[key]
+                if reference.count > 0:
+                     output_file.write(reference.summary_line(mapq=header.mapq_keys()))
+                     output_file.write("\n")
+    if cigar_path:               
+        with open(cigar_path, 'w') as output_file:
+            output_file.write(Reference.header_line(cigar=header.cigar_keys()))
+            output_file.write("\n")
+            output_file.write(str(header.all_reference().summary_line(cigar=header.cigar_keys())))
+            output_file.write("\n")
+            for key in header.reference_dictionary:
+                reference = header.reference_dictionary[key]
+                if reference.count > 0:
+                     output_file.write(reference.summary_line(cigar=header.cigar_keys()))
+                     output_file.write("\n")
+
+    if sequence_path:               
+        with open(sequence_path, 'w') as output_file:
+            output_file.write(Reference.header_line(sequence=header.sequence_keys()))
+            output_file.write("\n")
+            output_file.write(str(header.all_reference().summary_line(sequence=header.sequence_keys())))
+            output_file.write("\n")
+            for key in header.reference_dictionary:
+                reference = header.reference_dictionary[key]
+                if reference.count > 0:
+                     output_file.write(reference.summary_line(sequence=header.sequence_keys()))
+                     output_file.write("\n")
+                     
+    if quality_path:               
+        with open(quality_path, 'w') as output_file:
+            output_file.write(Reference.header_line(quality=header.quality_keys()))
+            output_file.write("\n")
+            output_file.write(str(header.all_reference().summary_line(quality=header.quality_keys())))
+            output_file.write("\n")
+            for key in header.reference_dictionary:
+                reference = header.reference_dictionary[key]
+                if reference.count > 0:
+                     output_file.write(reference.summary_line(quality=header.quality_keys()))
+                     output_file.write("\n")
         
 if __name__ == '__main__':
     usage = "usage: %prog [options] INPUT_FILE"
     # define options
     parser = OptionParser(usage=usage)
     parser.add_option("-o", "--output", dest="output_path", 
-                      help="Path to file, where the output should be written. Defaults to counts.tsv", 
-                      default="lengths.tsv")
-    count_group = OptionGroup(parser, "Count individual Values Options",
-                    "Specifes if the number of times each values is found in these fields. "
+                      help="Path to general file, where any output not redirected below should be written. Defaults to summary.tsv", 
+                      default="summary.tsv")
+    data_group = OptionGroup(parser, "Summary/Count individual Values Options",
+                    "Specifes what action should be taken with the data for this column. "
+                    "Legal values are 'ignore'(default), 'summary', 'count'."
+                    "'ignore' or not provided will cause the column in this data not to be output."
+                    "'summary' will cause summary columns to be added to the output file."
+                    "'count' will cause the counts of each value found to be added to the output file."
                     "For example it will count how many of each of C, G, T, and A are found in the sequence. "
                     "Does not effect validation of lengths.")
-    count_group.add_option("-s", "--sequence", 
-            dest="count_sequence",
-            action="store_true",
-            help="If used this flag will count the values in every aligmnent's sequence",
-            default = default_count_sequence)
-    count_group.add_option("-q", "--quality", 
-            dest="count_quality",
-            action="store_true",
-            help="If used this flag will count the values in every aligmnent's quality",
-            default = default_count_quality)
-    count_group.add_option("-c", "--cigar", 
-            dest="count_cigar",
-            action="store_true",
-            help="If used this flag will count the values in every aligmnent's sequence",
-            default = default_count_cigar)
-    parser.add_option_group(count_group)
+    data_group.add_option("-f", "--flag", 
+            dest="flag",
+            help="Causes the flag column to be output as requested",
+            default = default_level)
+    data_group.add_option("-p", "--position", 
+            dest="position",
+            help="Causes the position column to be output as requested. No Count position available",
+            default = default_level)
+    data_group.add_option("-m", "--mapq", 
+            dest="mapq",
+            help="Causes the mapQ column to be output as requested",
+            default = default_level)
+    data_group.add_option("-c", "--cigar", 
+            dest="cigar",
+            help="Causes the cigar column to be output as requested",
+            default = default_level)
+    data_group.add_option("-s", "--sequence", 
+            dest="sequence",
+            help="Causes the sequence column to be output as requested",
+            default = default_level)
+    data_group.add_option("-q", "--quality", 
+            dest="quality",
+            help="Causes the quality column to be output as requested",
+            default = default_level)
+    parser.add_option_group(data_group)
+    
+    path_group = OptionGroup(parser, "Path to files to write Count details to"
+           "If provided will create a second output file with the counts of the values found this column"
+           "Not effected by the Summary/Count flags."
+           "Must be a file path and not a directory path")       
+    path_group.add_option("--flag_path", 
+            dest="flag_path",
+            help="Causes the counts of flag column to be output in this path",
+            default = None)
+    path_group.add_option("--mapq_path", 
+            dest="mapq_path",
+            help="Causes the counts of mapQ column to be output in this path",
+            default = None)
+    path_group.add_option("--cigar_path", 
+            dest="cigar_path",
+            help="Causes the counts of cigar column to be output in this path",
+            default = None)
+    path_group.add_option("--sequence_path", 
+            dest="sequence_path",
+            help="Causes the counts of sequence column to be output in this path",
+            default = None)
+    path_group.add_option("--quality_path", 
+            dest="quality_path",
+            help="Causes the counts of quality column to be output in this path",
+            default = None)
+    parser.add_option_group(path_group)
                       
     # parse
     options, args = parser.parse_args()
@@ -458,6 +651,17 @@ if __name__ == '__main__':
     elif len(args) > 1:
         parser.error("ERROR! Multiple values for INPUT_FILE found.")   
         
-    summary(args[0], options.output_path, options.count_sequence,
-            options.count_quality, options.count_cigar)
+    summary(args[0], 
+           options.output_path, 
+           flag=options.flag, 
+           position=options.position,
+           mapq=options.mapq,
+           cigar=options.cigar, 
+           sequence=options.sequence,
+           quality=options.quality,
+           flag_path=options.flag_path,
+           mapq_path=options.mapq_path,
+           cigar_path=options.cigar_path,
+           sequence_path=options.sequence_path,
+           quality_path=options.quality_path)
 
