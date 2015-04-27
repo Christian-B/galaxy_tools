@@ -11,7 +11,7 @@
   <tests>
     <test>
       <param name="input" value="small.fasta"/>
-      <output name="output" file="Length.tsv"/>
+      <output name="output" file="fasta_summary.tsv"/>
     </test>
   </tests>
 
