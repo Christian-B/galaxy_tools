@@ -81,6 +81,48 @@
         </data>    
   </outputs>
 
+  <tests>
+    <test>
+      <param name="input" value="illuminaGEO1_filt_Bowtie.sam"/>
+      <output name="output" file="nosummary.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="illuminaGEO1_filt_Bowtie.sam"/>
+      <param name="flag_option" value="Summary"/>
+      <param name="position_option" value="Summary"/>
+      <param name="mapq_option" value="Summary"/>
+      <param name="cigar_option" value="Summary"/>
+      <param name="sequence_option" value="Summary"/>
+      <param name="quality_option" value="Summary"/>
+      <output name="output" file="allsummary.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="illuminaGEO1_filt_Bowtie.sam"/>
+      <param name="flag_option" value="Count"/>
+      <param name="mapq_option" value="Count"/>
+      <param name="cigar_option" value="Count"/>
+      <param name="sequence_option" value="Count"/>
+      <param name="quality_option" value="Count"/>
+      <output name="output" file="allcount.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="illuminaGEO1_filt_Bowtie.sam"/>
+      <param name="flag_option" value="Count"/>
+      <param name="mapq_option" value="Count"/>
+      <param name="cigar_option" value="Count"/>
+      <param name="sequence_option" value="Count"/>
+      <param name="quality_option" value="Summary"/>
+      <output name="output" file="allmixed.tsv"/>
+    </test>
+    <!--test>
+      <param name="input" value="illuminaGEO1_filt_Bowtie.sam"/>
+      <param name="flag_file" value="True"/>
+      <param name="flag_output" value="flagtest.tsv"/>
+      <output name="output2" file="flagcount.tsv"/>
+      <output name="output1" file="nosummary.tsv"/>
+    </test-->
+  </tests>
+
   <help>
 Summarization tool for Sam input file.
   </help>
