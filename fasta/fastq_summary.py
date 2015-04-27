@@ -84,7 +84,6 @@ class FastqSummary:
         for key in counterKeys():            
             reply+= "\t" + str(self.sequence_counter[key]) 
         reply += "\t" + self.name 
-        print reply
         return reply 
       
 _allSummary = FastqSummary(None)
