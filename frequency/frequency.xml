@@ -18,8 +18,30 @@
 
   <tests>
     <test>
-      <param name="input" value="input.tsv"/>
-      <output name="output" file="output.tsv"/>
+      <param name="input" value="small.tsv"/>
+      <output name="output" file="small_nohead.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="small.tsv"/>
+      <param name="header" value="True"/>
+      <output name="output" file="small_count.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="medium.tsv"/>
+      <param name="header" value="True"/>
+      <output name="output" file="medium_count10.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="medium.tsv"/>
+      <param name="header" value="True" />
+      <param name="max_options" value="6"/>
+      <output name="output" file="medium_count6.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="medium.tsv"/>
+      <param name="header" value="True" />
+      <param name="max_options" value="20"/>
+      <output name="output" file="medium_count20.tsv"/>
     </test>
   </tests>
 

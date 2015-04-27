@@ -5,7 +5,7 @@ def countFrequency(input_path, output_path, seperator, max_options, has_header):
         
     def processLine(line):
         for (col, st) in enumerate(line.strip().split(seperator)): 
-            if len(counts[col]) < max_options:
+            if len(counts[col]) <= max_options:
                   counts[col][st] = counts[col].setdefault(st, 0) + 1                      
 
     print "Counting ", input_path, "to", output_path
@@ -23,10 +23,10 @@ def countFrequency(input_path, output_path, seperator, max_options, has_header):
             processLine(line)
 
     with open(output_path, 'w') as output_file:
-        line = ["Column","Value"]
+        line = ["Column","Value","Count"]
         output_file.write("\t".join(line) + "\n")
         for col in range(number_of_columns):
-            if len(counts[col]) < max_options:   
+            if len(counts[col]) <= max_options:   
                 for value in sorted(counts[col]):
                     line = []
                     if has_header:
