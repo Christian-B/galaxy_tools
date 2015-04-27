@@ -8,7 +8,4 @@
 tool_test_output.html
 tool_test_output.json
 
-#Results files still in wrong place
-frequency/counts.tsv
-fasta/lengths.tsv
-sam/lengths.tsv
+
