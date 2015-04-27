@@ -61,8 +61,38 @@
 
   <tests>
     <test>
-      <param name="input" value="input.tsv"/>
-      <output name="output" file="output.tsv"/>
+      <param name="input" value="small.tsv"/>
+      <output name="output" file="small_headless.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="small.tsv"/>
+      <param name="option" value="header"/>
+      <output name="output" file="small_summary.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="small_fluff_at_top.tsv"/>
+      <param name="option" value="ignore_header"/>
+      <param name="ignore" value="1"/>
+      <output name="output" file="small_summary.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="small_fluff_at_top.tsv"/>
+      <param name="option" value="ignore"/>
+      <param name="ignore" value="1"/>
+      <output name="output" file="small_headless.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="small_fluff_below_header.tsv"/>
+      <param name="option" value="header_ignore"/>
+      <param name="ignore" value="2"/>
+      <output name="output" file="small_summary.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="small_fluff_below_header.tsv"/>
+      <param name="option" value="configure"/>
+      <param name="header" value="0"/>
+      <param name="data_start" value="3"/>
+      <output name="output" file="small_summary.tsv"/>
     </test>
   </tests>
 

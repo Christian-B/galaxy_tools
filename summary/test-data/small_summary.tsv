@@ -1,0 +1,6 @@
+Column	Type	count	Min	Max	Sum	Average
+Name	string	3	Christian	Mark	n/a	n/a	
+Age	int	3	25	52	111	37.0
+Salary	float	3	30000	45000	109000.5	36333.5
+Code	string	3	234b	45	n/a	n/a	
+Number	int	3	3222	34553	71199	23733.0

@@ -1,0 +1,6 @@
+Column	Type	count	Min	Max	Sum	Average
+column 0:	string	4	Christian	Name	n/a	n/a	
+column 1:	string	4	25	Age	n/a	n/a	
+column 2:	string	4	30000	Salary	n/a	n/a	
+column 3:	string	4	234b	Code	n/a	n/a	
+column 4:	string	4	3222	Number	n/a	n/a	
