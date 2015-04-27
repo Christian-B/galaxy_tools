@@ -4,8 +4,11 @@
 #Lock files
 *~lock*
 
-#Files written by tests
-summary/summary.tsv
+#Files written by Planemo
+tool_test_output.html
+tool_test_output.json
+
+#Results files still in wrong place
 frequency/counts.tsv
 fasta/lengths.tsv
 sam/lengths.tsv
