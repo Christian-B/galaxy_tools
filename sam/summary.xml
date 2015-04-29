@@ -114,13 +114,55 @@
       <param name="quality_option" value="Summary"/>
       <output name="output" file="allmixed.tsv"/>
     </test>
-    <!--test>
+    <test>
       <param name="input" value="illuminaGEO1_filt_Bowtie.sam"/>
       <param name="flag_file" value="True"/>
-      <param name="flag_output" value="flagtest.tsv"/>
-      <output name="output2" file="flagcount.tsv"/>
-      <output name="output1" file="nosummary.tsv"/>
-    </test-->
+      <output name="summary_output" file="nosummary.tsv"/>
+      <output name="flag_ouput" file="flagcount.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="illuminaGEO1_filt_Bowtie.sam"/>
+      <param name="mapq_file" value="True"/>
+      <output name="summary_output" file="nosummary.tsv"/>
+      <output name="mapq_ouput" file="mapqcount.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="illuminaGEO1_filt_Bowtie.sam"/>
+      <param name="cigar_file" value="True"/>
+      <output name="summary_output" file="nosummary.tsv"/>
+      <output name="cigar_ouput" file="cigarcount.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="illuminaGEO1_filt_Bowtie.sam"/>
+      <param name="sequence_file" value="True"/>
+      <output name="summary_output" file="nosummary.tsv"/>
+      <output name="sequence_ouput" file="sequencecount.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="illuminaGEO1_filt_Bowtie.sam"/>
+      <param name="quality_file" value="True"/>
+      <output name="summary_output" file="nosummary.tsv"/>
+      <output name="quality_ouput" file="qualitycount.tsv"/>
+    </test>
+    <test>
+      <param name="input" value="illuminaGEO1_filt_Bowtie.sam"/>
+      <param name="flag_option" value="Count"/>
+      <param name="flag_file" value="True"/>
+      <param name="mapq_option" value="Count"/>
+      <param name="mapq_file" value="True"/>
+      <param name="cigar_option" value="Count"/>
+      <param name="cigar_file" value="True"/>
+      <param name="sequence_option" value="Count"/>
+      <param name="sequence_file" value="True"/>
+      <param name="quality_option" value="Summary"/>
+      <param name="quality_file" value="True"/>
+      <output name="summary_output" file="allmixed.tsv"/>
+      <output name="flag_ouput" file="flagcount.tsv"/>
+      <output name="mapq_ouput" file="mapqcount.tsv"/>
+      <output name="cigar_ouput" file="cigarcount.tsv"/>
+      <output name="sequence_ouput" file="sequencecount.tsv"/>
+      <output name="quality_ouput" file="qualitycount.tsv"/>
+    </test>
   </tests>
 
   <help>
