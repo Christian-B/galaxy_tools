@@ -67,9 +67,10 @@ def summerize(input_path,
                     types = [None for i in range(number_of_columns)]
                     headers = []
                 elif len(parts) != number_of_columns:
-                    if line_number >= header_line and line_number >= data_start:
+                    if line_number > first_line:
                         error = "Line" + str(line_number)
-                        error += "does not have the expected number of columns."
+                        error += "does not have the expected number "
+                        error += "of columns."
                         print >> sys.stderr, error
                         error = "Found" + parts + "but expected"
                         error += str(number_of_columns) + "column(s)."
