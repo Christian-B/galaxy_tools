@@ -1,0 +1,18 @@
+<tool id="brenninc_errortest" name="Error Test" version="0.1">
+	<command interpreter="python">errortest.py</command>
+	<inputs>
+		<param format="txt" name="input" type="data" label="File to be Read" help="Data file" />
+	</inputs>
+	<outputs>
+		<data format="png" name="output" metadata_source="input"/>
+	</outputs>
+	<stdio>
+        <exit_code range="1:255"   level="fatal"   description="Oops an error" />
+    </stdio>
+	<tests>
+      <test>
+        <param name="input" value="test_in.txt"/>
+      </test>  
+    </tests>
+
+</tool>
