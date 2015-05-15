@@ -12,28 +12,28 @@
 	    --user_id $__user_id__
 	    --user_email $__user_email__
 	    
-	    #if $extra_info.option=="Name"
-	        --name=$extra_info.name
+	    <!--#if $extra_info.option=="Name"
+	        - -name=$extra_info.name
 	    #elif $extra_info.option=="Id"
-	        --id=$extra_info.id
-	    #end if    
+	        - -id=$extra_info.id
+	    #end if-->    
 	    <!-- More meta data -->
 	</command>
 	<inputs>
 	    <!-- repeat -->
-        <conditional name="extra_info">
-            <param name="option" type="select" label="What Extra info shall I ask for">
-                <option value="None" selected="true">Don't ask for extra info</option>
+        <!--conditional name="extra_info"-->
+            <param name="option" type="select" label="What Extra info shall I ask for" default="Nope">
+                <option value="Nope" selected="true">Don't ask for extra info</option>
                 <option value="Name">Ask for the name</option>
                 <option value="Id">Ask for the id</option>
             </param>
-            <when value="Name">
+            <!--when value="Name">
                 <param name="name" size="4" type="text" label="So what is your name then" />
             </when>
             <when value="Id">
                 <param name="id" size="4" type="text" label="Ok So what is your Id Number" />
             </when>
-        </conditional>
+        </conditional-->
 		<param format="txt" name="input" type="data" label="File to be Read" help="Data file" />
 	</inputs>
 	<outputs>
@@ -52,7 +52,7 @@
         <param name="input" value="test_in.txt"/>
         <output name="output" file="test_out.txt"/>
       </test>  
-      <test>
+      <!--test>
         <param name="option" value="Name" />
         <param name="name" value="Christian" />
         <param name="input" value="test_in.txt"/>
@@ -63,7 +63,7 @@
         <param name="id" value="1234" />
         <param name="input" value="test_in.txt"/>
         <output name="output" file="test_out.txt"/>
-      </test>  
+      </test-->  
     </tests>
 
 </tool>
