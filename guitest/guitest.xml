@@ -12,28 +12,61 @@
 	    --user_id $__user_id__
 	    --user_email $__user_email__
 	    
-	    <!--#if $extra_info.option=="Name"
-	        - -name=$extra_info.name
+	    #if $extra_info.option=="noextra" 
+	        --name="Not provided" 
+	    #elif $extra_info.option=="Name"
+	        --name=$extra_info.name
 	    #elif $extra_info.option=="Id"
-	        - -id=$extra_info.id
-	    #end if-->    
+	        --id=$extra_info.id
+	    #end if    
+	    
+	    #if len(str($astring)) > 0
+	        --astring "$astring"
+	    #end if    
+	    #if len(str($boxst)) > 0
+	        --boxst "$boxst"
+	    #end if    
+	    --smallint $smallint
+	    --anyint $anyint
+	    --smallfloat $smallfloat
+	    --anyfloat $anyfloat
+	    --truefalse $truefalse
+	    --christian $christian
 	    <!-- More meta data -->
 	</command>
 	<inputs>
 	    <!-- repeat -->
-        <!--conditional name="extra_info"-->
-            <param name="option" type="select" label="What Extra info shall I ask for" default="Nope">
-                <option value="Nope" selected="true">Don't ask for extra info</option>
+        <conditional name="extra_info">
+            <param name="option" type="select" label="What Extra info shall I ask for">
+                <option value="noextra" selected="true">Don't ask for extra info</option>
                 <option value="Name">Ask for the name</option>
                 <option value="Id">Ask for the id</option>
             </param>
-            <!--when value="Name">
+            <when value="Name">
                 <param name="name" size="4" type="text" label="So what is your name then" />
             </when>
             <when value="Id">
                 <param name="id" size="4" type="text" label="Ok So what is your Id Number" />
             </when>
-        </conditional-->
+        </conditional>
+        
+        <!--size appears top have little effect here except with area -->
+        <!--param name="shortst" type="text" size="5" label="A small text field" />
+        <param name="mediumst" type="text" size="45" label="A medium text field" />
+        <param name="longst" type="text"  size="200" label="A long text field" /-->
+        
+        <param name="astring" type="text" label="A text field" />
+        
+        <param name="boxst" type="text" area="true" size="5x40" label="A text box" />
+        
+        <param name="smallint" type="integer" size="4" value="0" min="0" max="10" label="An integer from 0 to 10"/>
+        <param name="anyint" type="integer" size="10" value="0" label="Any integer"/>
+        <param name="smallfloat" type="float" size="10" value="0" min="-10" max="10" label="An float between -10 to 10"/>
+        <param name="anyfloat" type="float" size="10" value="0.0" label="Any float"/>
+       
+        <param name="truefalse" type="boolean" checked="true" label="Simple boolean" />
+        <param name="christian" type="boolean" truevalue="christian" falsevalue='"not christian"' label="Are you Christian"/> 
+        
 		<param format="txt" name="input" type="data" label="File to be Read" help="Data file" />
 	</inputs>
 	<outputs>
@@ -48,11 +81,12 @@
 	</help>    
 	<tests>
       <test>
-        <param name="option" value="None" />
+        <param name="option" value="noextra" />
         <param name="input" value="test_in.txt"/>
+        <param name="astring" value="Text with a space in it"/>
         <output name="output" file="test_out.txt"/>
       </test>  
-      <!--test>
+      <test>
         <param name="option" value="Name" />
         <param name="name" value="Christian" />
         <param name="input" value="test_in.txt"/>
@@ -63,7 +97,7 @@
         <param name="id" value="1234" />
         <param name="input" value="test_in.txt"/>
         <output name="output" file="test_out.txt"/>
-      </test-->  
+      </test>  
     </tests>
 
 </tool>

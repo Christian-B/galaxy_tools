@@ -13,11 +13,11 @@ if __name__ == '__main__':
                         action="store_true")
     parser.add_argument("--input",
                         help="Path to input file.",
-                        default="test_in.txt")
+                        default="test-data/test_in.txt")
     parser.add_argument("--output",
                         help="Full path, "
                         "including file name where output should be placed.",
-                        default="test_out.txt")  
+                        default="test-data/test_out.txt")  
     parser.add_argument("--tool_directory",
                         help="The directory the tool currently resides in "
                         "(new in 15.03).",
@@ -46,8 +46,18 @@ if __name__ == '__main__':
     parser.add_argument("--id",
                         help="The Id value: ",
                         default=None)
+    parser.add_argument("--astring", help="astring value", default=None)
+    parser.add_argument("--boxst", help="boxst value", default=None)
+    parser.add_argument("--smallint", help="smallint value", default=None)
+    parser.add_argument("--anyint", help="anyint value", default=None)
+    parser.add_argument("--smallfloat", help="smallfloat value", default=None)
+    parser.add_argument("--anyfloat", help="anyfloat value", default=None)
+    parser.add_argument("--truefalse", help="truefalse value", default=None)
+    parser.add_argument("--christian", help="christian value", default=None)
+
     args = parser.parse_args()
         
+
     if args.version:
         version()
 
@@ -69,3 +79,13 @@ if __name__ == '__main__':
     print "user_email", args.user_email
     print "name", args.name
     print "id", args.id
+    
+    print "astring", args.astring
+    print "boxst", args.boxst
+    print "smallint", args.smallint
+    print "anyint", args.anyint
+    print "smallfloat", args.smallfloat
+    print "anyfloat", args.anyfloat
+    print "truefalse", args.truefalse
+    print "christian", args.christian
+
