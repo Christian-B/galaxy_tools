@@ -1,16 +1,11 @@
 import argparse
 import sys
 
-def version():
-    print "0.0.1"
-    sys.exit(0)
-
 if __name__ == '__main__':
     description = "A simple test for the python gui."
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("--version",
-                        help="Prints out the version number and exits",
-                        action="store_true")
+    parser = argparse.ArgumentParser(prog='GuiTest')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.0.3')    
     parser.add_argument("--input",
                         help="Path to input file.",
                         default="test-data/test_in.txt")
@@ -40,6 +35,12 @@ if __name__ == '__main__':
     parser.add_argument("--user_email",
                         help="User's email address",
                         default=None)
+
+    parser.add_argument("--table_file", action='append', default=[])  
+    parser.add_argument("--table_column", action='append', default=[])  
+    
+    parser.add_argument("--friend", action='append', default=[])  
+                     
     parser.add_argument("--name",
                         help="The name value: ",
                         default=None)
@@ -63,10 +64,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
         
-
-    if args.version:
-        version()
-
     print >> sys.stderr, 'Hi, This is where you would find output to sys.error'
 
     print "Standard output gets displayed in the window"
@@ -83,6 +80,17 @@ if __name__ == '__main__':
     print "datatypes_config", args.datatypes_config
     print "user_id", args.user_id
     print "user_email", args.user_email
+    
+    for friend in args.friend:
+        print "friend",friend
+
+    if len(args.table_file) != len(args.table_column):
+        print "table_file", args.table_file
+        print "table_column", args.table_column
+    else:
+        for index, table_file in enumerate(args.table_file):
+            print "column", args.table_column[index], "in table", table_file
+            
     print "name", args.name
     print "id", args.id
     

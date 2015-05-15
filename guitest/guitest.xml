@@ -12,6 +12,15 @@
 	    --user_id $__user_id__
 	    --user_email $__user_email__
 	    
+	    #for $i, $s in enumerate( $inputseries )
+	        --table_file ${s.repeatinput}
+    	    --table_column ${s.repeatcol}
+        #end for
+    	    
+	    #for $i, $f in enumerate( $friends )
+            --friend=${f.friend}
+        #end for
+        
 	    #if $extra_info.option=="Name"
 	        --name=$extra_info.name
 	    #elif $extra_info.option=="Id"
@@ -39,7 +48,14 @@
 	    <!-- More meta data -->
 	</command>
 	<inputs>
-	    <!-- repeat -->
+	    
+	    <repeat name="inputseries" title="Repeatedly enter input files">
+    	    <param name="repeatinput" type="data" format="tabular" label="Dataset"/>
+            <param name="repeatcol" type="data_column" data_ref="repeatinput" use_header_names="true" label="Column to use"/>
+        </repeat>
+	    <repeat name="friends" title="Friend">
+            <param name="friend" type="text" label="Give me the name of one of your friends" />
+        </repeat>
         <conditional name="extra_info">
             <param name="option" type="select" label="What Extra info shall I ask for">
                 <option value="noextra" selected="true">Don't ask for extra info</option>
