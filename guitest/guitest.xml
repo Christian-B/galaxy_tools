@@ -12,11 +12,12 @@
 	    --user_id $__user_id__
 	    --user_email $__user_email__
 	    
-	    #if $extra_info.option=="noextra" 
-	        --name="Not provided" 
-	    #elif $extra_info.option=="Name"
+	    #if $extra_info.option=="Name"
 	        --name=$extra_info.name
 	    #elif $extra_info.option=="Id"
+	        --id=$extra_info.id
+	    #elif $extra_info.option=="Both"
+	        --name=$extra_info.name
 	        --id=$extra_info.id
 	    #end if    
 	    
@@ -32,6 +33,9 @@
 	    --anyfloat $anyfloat
 	    --truefalse $truefalse
 	    --christian $christian
+	    
+        --user_file_type $type_selection.type_to_use
+        --galaxy_file_type $input.ext
 	    <!-- More meta data -->
 	</command>
 	<inputs>
@@ -41,11 +45,16 @@
                 <option value="noextra" selected="true">Don't ask for extra info</option>
                 <option value="Name">Ask for the name</option>
                 <option value="Id">Ask for the id</option>
+                <option value="Both">Ask for the both</option>
             </param>
             <when value="Name">
                 <param name="name" size="4" type="text" label="So what is your name then" />
             </when>
             <when value="Id">
+                <param name="id" size="4" type="text" label="Ok So what is your Id Number" />
+            </when>
+            <when value="Both">
+                <param name="name" size="4" type="text" label="So what is your name then" />
                 <param name="id" size="4" type="text" label="Ok So what is your Id Number" />
             </when>
         </conditional>
@@ -67,10 +76,40 @@
         <param name="truefalse" type="boolean" checked="true" label="Simple boolean" />
         <param name="christian" type="boolean" truevalue="christian" falsevalue='"not christian"' label="Are you Christian"/> 
         
-		<param format="txt" name="input" type="data" label="File to be Read" help="Data file" />
+        <!-- This works in galaxay but not palemo and is of little use anyway! 
+        param name="file_type" type="select" label="File Format" help="Pick a file format from the ones Galaxy Supports">
+            <options from_parameter="tool.app.datatypes_registry.upload_file_formats" 
+                     transform_lines="[ &quot;%s%s%s&quot; % ( line, self.separator, line ) for line in obj ]">
+                <column name="value" index="1"/>
+                <column name="name" index="0"/>
+                <filter type="sort_by" column="0"/>
+                <filter type="unknown" name="Sorry Don't know" value="unkown" index="0"/>
+            </options>
+        </param-->
+
+        <conditional name="type_selection">
+            <param name="type_to_use" type="select" label="What Type of file info shall I ask for">
+                <option value="Any" selected="true">Any file</option>
+                <option value="Sam">Sam File Type</option>
+                <option value="Fasta">Fasta File Type</option>
+                <option value="Fastq">Fastq File Type</option>
+            </param>
+            <when value="Any">
+        		<param name="input" type="data" label="Any File to be Read" help="Any file" />
+            </when>
+            <when value="Sam">
+        		<param format="Sam" name="input" type="data" label="Sam File to be Read" help="Sam file" />
+            </when>
+            <when value="Fasta">
+        		<param format="Fasta" name="input" type="data" label="Fasta File to be Read" help="Fasta file" />
+            </when>
+            <when value="Fastq">
+        		<param format="Fastq" name="input" type="data" label="Fastq File to be Read" help="Fastq file" />
+            </when>
+        </conditional>
 	</inputs>
 	<outputs>
-		<data format="txt" name="output" metadata_source="input"/>
+		<data format="text" name="output" metadata_source="input"/>
 	</outputs>
     <stdio>
         <exit_code range="1:255"   level="fatal"   description="Oops an error" />
@@ -95,7 +134,7 @@
       <test>
         <param name="option" value="Id" />
         <param name="id" value="1234" />
-        <param name="input" value="test_in.txt"/>
+        <param name="input" value="test_in.weird"/>
         <output name="output" file="test_out.txt"/>
       </test>  
     </tests>

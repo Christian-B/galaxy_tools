@@ -54,6 +54,12 @@ if __name__ == '__main__':
     parser.add_argument("--anyfloat", help="anyfloat value", default=None)
     parser.add_argument("--truefalse", help="truefalse value", default=None)
     parser.add_argument("--christian", help="christian value", default=None)
+    parser.add_argument("--user_file_type",
+                        help="The declared file type value: ",
+                        default=None)
+    parser.add_argument("--galaxy_file_type",
+                        help="Galaxy file type value: ",
+                        default=None)
 
     args = parser.parse_args()
         
@@ -88,4 +94,7 @@ if __name__ == '__main__':
     print "anyfloat", args.anyfloat
     print "truefalse", args.truefalse
     print "christian", args.christian
+
+    print "user_file_type", args.user_file_type
+    print "galaxy_file_type", args.galaxy_file_type
 
