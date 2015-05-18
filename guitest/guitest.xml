@@ -123,6 +123,12 @@
         		<param format="Fastq" name="input" type="data" label="Fastq File to be Read" help="Fastq file" />
             </when>
         </conditional>
+        <!--Need to work out how to do a data collection input
+        <param name="inputFastqPair" type="data_collection" collection_type="paired" label="Input FASTQs" format="fastq"/>
+        -->
+   		<param name="nochristian" type="data" label="Any File without 'Christian' in it" help="Any file that does not contain the String Christian" >
+   		    <validator type="expression" message="Cheching up on Christian not allowed">'..' not in value</validator>
+   		</param>    
 	</inputs>
 	<outputs>
 		<data format="text" name="output" metadata_source="input"/>
