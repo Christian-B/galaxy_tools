@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<tool_dependency>
+
+    <package name="samtools" version="0.1.19">
+        <repository changeset_revision="95d2c4aefb5f" name="package_samtools_0_1_19" owner="devteam" toolshed="https://toolshed.g2.bx.psu.edu" />
+    </package>
+
+    <package name="pysam" version="0.7.7">
+        <repository changeset_revision="b62538c8c664" name="package_pysam_0_7_7" owner="iuc" toolshed="https://toolshed.g2.bx.psu.edu" />
+    </package>
+
+    <package name="htseq" version="0.6.1">
+        <repository changeset_revision="5b3da3e3543d" name="package_htseq_0_6" owner="iuc" toolshed="https://toolshed.g2.bx.psu.edu" />
+    </package>
+
+</tool_dependency>
