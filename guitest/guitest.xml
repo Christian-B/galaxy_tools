@@ -1,5 +1,8 @@
 <tool id="brenninc_guitest" name="Test for the Galaxy GUI" version="0.2" hidden="false" workflow_compatible="true">
 	<description>This is the description of the tool</description>
+    <stdio>
+        <exit_code range="1:255"   level="fatal"   description="Oops an error" />
+    </stdio>
 	<version_command>python guitest.py --version</version_command>
 	<command interpreter="python">guitest.py 
 	    --input $input 
@@ -18,7 +21,7 @@
         #end for
     	    
 	    #for $i, $f in enumerate( $friends )
-            --friend=${f.friend}
+            --friend=${f.friend}git diff 
         #end for
         
 	    #if $extra_info.option=="Name"
@@ -111,7 +114,7 @@
                 <option value="Fastq">Fastq File Type</option>
             </param>
             <when value="Any">
-        		<param name="input" type="data" label="Any File to be Read" help="Any file" />
+        		<param format="data" name="input" type="data" label="Any File to be Read" help="Any file" />
             </when>
             <when value="Sam">
         		<param format="Sam" name="input" type="data" label="Sam File to be Read" help="Sam file" />
@@ -126,25 +129,30 @@
         <!--Need to work out how to do a data collection input
         <param name="inputFastqPair" type="data_collection" collection_type="paired" label="Input FASTQs" format="fastq"/>
         -->
-   		<param name="nochristian" type="data" label="Any File without 'Christian' in it" help="Any file that does not contain the String Christian" >
+        
+        <!-- Fail in Planemo need more investigation -->
+   		<!--param name="nochristian" type="data" label="Any File without 'Christian' in it" help="Any file that does not contain the String Christian" >
    		    <validator type="expression" message="Cheching up on Christian not allowed">'..' not in value</validator>
-   		</param>    
+   		</param-->
+   		    
+   		<conditional name="bdg_options">
+           <param name="bdg2" type="boolean" checked="False"
+               truevalue="-B2" falsevalue="" label="Save pileups in bedGraph?" />
+           <when value="-B2">
+                <param name="astring" type="text" label="A text field" />
+           </when>
+        </conditional>        
 	</inputs>
 	<outputs>
 		<data format="text" name="output" metadata_source="input"/>
 	</outputs>
-    <stdio>
-        <exit_code range="1:255"   level="fatal"   description="Oops an error" />
-    </stdio>
 
-	<help>
-	    User help section
-	</help>    
 	<tests>
       <test>
         <param name="option" value="noextra" />
         <param name="input" value="test_in.txt"/>
         <param name="astring" value="Text with a space in it"/>
+        <param name="bdg_options.bdg2" value="-B2" />
         <output name="output" file="test_out.txt"/>
       </test>  
       <test>
@@ -160,5 +168,10 @@
         <output name="output" file="test_out.txt"/>
       </test>  
     </tests>
+	<help>
+	    User help section
+	</help>    
+    <citations>
+    </citations>
 
 </tool>
