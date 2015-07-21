@@ -1,0 +1,64 @@
+<tool id="Peters_boolean_issue2" name="Peter's Boolean test issue 2" version="1.2">
+<description>Demonstrate issue with using booleans in Galaxy tests</description>
+<command interpreter="bash">
+  galaxy_boolean_test_issue2.sh
+  $output_1 $bdg1 $bdg_options.bdg2
+  #if str($bdg_options.bdg2) == 'True'
+     -B2 $bdg_options.spmr
+     #if str($bdg_options.make_bigwig) == 'True'
+         --make-big-wig
+     #end if
+  #end if
+</command>
+<inputs>
+  <!-- Normal boolean -->
+  <param name="bdg1" type="boolean" checked="False"
+	 truevalue="-B1" falsevalue="" label="Save pileups in bedGraph?" />
+  <!-- Boolean used for conditional -->
+  <conditional name="bdg_options">
+    <param name="bdg2" type="boolean" checked="False"
+	   label="Save pileups in bedGraph?" />
+    <when value="true">
+      <param name="spmr" type="boolean" checked="False"
+	     truevalue="--SPMR" falsevalue="" label="Use --SPMR?" />
+      <param name="make_bigwig" type="boolean" checked="true"
+	     truevalue="True" falsevalue="" label="Generate bigWig?" />
+    </when>
+    <when value="false">
+      <!-- Display nothing -->
+    </when>
+  </conditional>
+</inputs>
+<outputs>
+  <data name="output_1" format="txt" label="Values of booleans" />
+</outputs>
+<tests>
+  <test>
+    <!-- #0: don't set any params explicitly -->
+    <output name="output_1">
+      <assert_contents>
+	<has_line line="Values are False" />
+      </assert_contents>
+    </output>
+  </test>
+  <test>
+    <!-- #1: set non-conditional boolean only to true -->
+    <param name="bdg1" value="true" />
+    <output name="output_1">
+      <assert_contents>
+	<has_line line="Values are -B1 False" />
+      </assert_contents>
+    </output>
+  </test>
+  <test>
+    <!-- #2: (try to) set conditional boolean to true using 'bdg2' -->
+    <param name="bdg1" value="True" />
+    <param name="bdg2" value="True" />
+    <output name="output_1">
+      <assert_contents>
+	<has_line line="Values are -B1 True -B2 --make-big-wig" />
+      </assert_contents>
+    </output>
+  </test>
+</tests>
+</tool>

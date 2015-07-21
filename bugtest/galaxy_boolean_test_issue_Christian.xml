@@ -1,0 +1,292 @@
+<tool id="brenninc_boolean_example" name="Christian Boolean issue example" version="1.0">
+<description>Demonstrate issue with using booleans in Galaxy tests</description>
+<command interpreter="bash">
+  galaxy_boolean_test_issue2.sh 
+  $output_1 bdg1= $bdg1 
+  bdg2= $bdg_options2.bdg2 $bdg_options2.check2 
+  ##Must be upder case here!
+  #if str($bdg_options2.bdg2) == 'True'
+     if_True
+  #end if
+  #if str($bdg_options2.bdg2) == 'true'
+     if_true
+  #end if
+  #if str($bdg_options2.bdg2) == 'False'
+     if_False
+  #end if
+  #if str($bdg_options2.bdg2) == 'false'
+     if_false
+  #end if
+  ##Value of truevalue=... LOST!
+  #if str($bdg_options2.bdg2) == 'unchanged'
+     if_unchanged
+  #end if
+  #if str($bdg_options2.bdg2) == 'changed'
+     if_changed
+  #end if
+  #if $bdg_options2.bdg2
+     if_bdg2
+  #else
+     else   
+  #end if
+  bdg3= $bdg_options3.bdg3 $bdg_options3.check3
+  ##Must be upder case here!
+  #if str($bdg_options3.bdg3) == 'True'
+     if_True
+  #end if
+  #if str($bdg_options3.bdg3) == 'true'
+     if_true
+  #end if
+  #if str($bdg_options3.bdg3) == 'False'
+     if_False
+  #end if
+  #if str($bdg_options3.bdg3) == 'false'
+     if_false
+  #end if
+  ##No truevalue=... so not expected to work!
+  #if str($bdg_options3.bdg3) == 'unchanged'
+     if_unchanged
+  #end if
+  #if str($bdg_options3.bdg3) == 'changed'
+     if_changed
+  #end if
+  #if $bdg_options3.bdg3
+     if_bdg3
+  #else
+     else   
+  #end if
+  bdg4= $bdg_options4.bdg4 $bdg_options4.check4
+  ##Must be upder case here!
+  #if str($bdg_options4.bdg4) == 'True'
+     if_True
+  #end if
+  #if str($bdg_options4.bdg4) == 'true'
+     if_true
+  #end if
+  #if str($bdg_options4.bdg4) == 'False'
+     if_False
+  #end if
+  #if str($bdg_options4.bdg4) == 'false'
+     if_false
+  #end if
+  ##Value of truevalue=... LOST!
+  #if str($bdg_options4.bdg4) == 'unchanged'
+     if_unchanged
+  #end if
+  #if str($bdg_options4.bdg4) == 'changed'
+     if_changed
+  #end if
+  #if $bdg_options4.bdg4
+     if_bdg4
+  #else
+     else   
+  #end if
+  bgd5= $bdg_options5.bdg5 $bdg_options5.check5
+  #if str($bdg_options5.bdg5) == 'True'
+     5checked
+  #end if
+  bdg6= $bdg_options6.bdg6 $bdg_options6.check6 
+  #if str($bdg_options6.bdg6) == 'True'
+     6checked
+  #end if
+  bdg7= $bdg_options7.bdg7 $bdg_options7.check7 
+  #if str($bdg_options7.bdg7) == 'True'
+     7checked
+  #end if
+
+</command>
+<inputs>
+  <!-- Normal boolean -->
+  <param name="bdg1" type="boolean" checked="false"
+	 truevalue="changed" falsevalue="unchanged" label="Boolean 1" />
+  <!-- Boolean used for conditional setting value-->
+  <conditional name="bdg_options2">
+    <param name="bdg2" type="boolean" checked="false"
+       truevalue="changed" falsevalue="unchanged" label="Boolean 2" />
+    <when value="changed">
+      <param name="check2" type="text" value="when_changed" />
+    </when>
+    <when value="unchanged">
+      <param name="check2" type="text" value="when_unchanged" />
+    </when>
+  </conditional>
+  <!-- Boolean used for conditional setting value-->
+  <conditional name="bdg_options3">
+    <!-- Either case works for checked -->
+    <param name="bdg3" type="boolean" checked="false"
+       label="Boolean 3" />
+    <when value="true"> <!-- Must be lower case here -->
+      <param name="check3" type="text" value="when_true" />
+    </when>
+    <when value="false">
+      <param name="check3" type="text" value="when_false" />
+    </when>
+    <when value="True">
+      <param name="check3" type="text" value="when_True" />
+    </when>
+    <when value="False">
+      <param name="check3" type="text" value="when_False" />
+    </when>
+  </conditional>
+  <!-- Boolean used for conditional setting value-->
+  <conditional name="bdg_options4">
+    <param name="bdg4" type="boolean" checked="true"
+       truevalue="unchanged" falsevalue="changed" label="Boolean 4" />
+    <when value="unchanged">
+      <param name="check4" type="text" value="when_unchanged" />
+    </when>
+    <when value="changed">
+      <param name="check4" type="text" value="when_changed" />
+    </when>
+  </conditional>
+  <!-- Boolean used for conditional setting value-->
+  <conditional name="bdg_options5">
+    <param name="bdg5" type="boolean" checked="true"
+       label="Boolean 5" />
+    <when value="True"> <!-- Upper case does not work even if tested first -->
+      <param name="check3" type="text" value="when_True" />
+    </when>
+    <when value="False">
+      <param name="check3" type="text" value="when_False" />
+    </when>
+    <when value="true">
+      <param name="check5" type="text" value="when_true" />
+    </when>
+    <when value="false">
+      <param name="check5" type="text" value="when_false" />
+    </when>
+  </conditional>
+  <conditional name="bdg_options6">
+    <!-- Either case works for checked -->
+    <param name="bdg6" type="boolean" checked="False"
+       label="Boolean 6" />
+    <when value="True"> <!--eevn if checked is upercase still lower case here-->
+      <param name="check6" type="text" value="when_True" />
+    </when>
+    <when value="False">
+      <param name="check6" type="text" value="when_False" />
+    </when>
+    <when value="true">
+      <param name="check6" type="text" value="when_true" />
+    </when>
+    <when value="false">
+      <param name="check6" type="text" value="when_false" />
+    </when>
+  </conditional>
+  <conditional name="bdg_options7">
+    <param name="bdg7" type="boolean" checked="True"
+       label="Boolean 7" />
+    <when value="True">
+      <param name="check7" type="text" value="when_True" />
+    </when>
+    <when value="False">
+      <param name="check7" type="text" value="when_False" />
+    </when>
+    <when value="true">
+      <param name="check7" type="text" value="when_true" />
+    </when>
+    <when value="false">
+      <param name="check7" type="text" value="when_false" />
+    </when>
+  </conditional>
+</inputs>
+<outputs>
+  <data name="output_1" format="txt" label="Values of booleans" />
+</outputs>
+<tests>
+  <test>
+    <!-- #1: don't set any params explicitly -->
+    <output name="output_1">
+      <assert_contents>
+	<has_line line="Values are bdg1= unchanged bdg2= False when_unchanged if_False else bdg3= False when_false if_False else bdg4= True when_unchanged if_True if_bdg4 bgd5= True when_true 5checked bdg6= False when_false bdg7= True when_true 7checked" />
+      </assert_contents>
+    </output>
+  </test>
+  <test>
+    <!-- #2: All false -->
+    <param name="bdg1" value="false" />
+    <param name="bdg2" value="false" /> 
+    <param name="bdg3" value="false" />
+    <param name="bdg4" value="false" /> <!-- Note does change value -->
+    <param name="bdg5" value="false" />
+    <param name="bdg6" value="false" /> 
+    <param name="bdg7" value="false" />
+    <output name="output_1">
+      <assert_contents>
+	<has_line line="Values are bdg1= unchanged bdg2= False when_unchanged if_False else bdg3= False when_false if_False else bdg4= False when_changed if_False else bgd5= False when_false bdg6= False when_false bdg7= False when_false" />
+      </assert_contents>
+    </output>
+  </test>
+  <test>
+    <!-- #3: All true -->
+    <param name="bdg1" value="true" />
+    <param name="bdg2" value="true" /> <!--Note does not change value as it should-->
+    <param name="bdg3" value="true" />
+    <param name="bdg4" value="true" />
+    <param name="bdg5" value="true" />
+    <param name="bdg6" value="true" />
+    <param name="bdg7" value="true" />
+    <output name="output_1">
+      <assert_contents>
+	<has_line line="Values are bdg1= changed bdg2= False when_unchanged if_False else bdg3= True when_true if_True if_bdg3 bdg4= True when_unchanged if_True if_bdg4 bgd5= True when_true 5checked bdg6= True when_true 6checked bdg7= True when_true 7checked" />
+      </assert_contents>
+    </output>
+  </test>  
+  <test>
+    <!-- #4: All False -->
+    <param name="bdg1" value="False" />
+    <param name="bdg2" value="False" />
+    <param name="bdg3" value="False" />
+    <param name="bdg4" value="False" /> <!-- Note does change value -->
+    <param name="bdg5" value="False" />
+    <param name="bdg6" value="False" /> 
+    <param name="bdg7" value="False" />
+    <output name="output_1">
+      <assert_contents>
+	<has_line line="Values are bdg1= unchanged bdg2= False when_unchanged if_False else bdg3= False when_false if_False else bdg4= False when_changed if_False else bgd5= False when_false bdg6= False when_false bdg7= False when_false" />
+      </assert_contents>
+    </output>
+  </test>
+  <test>
+    <!-- #5: All True -->
+    <param name="bdg1" value="True" />
+    <param name="bdg2" value="True" /> <!--Note does not change value as it should-->
+    <param name="bdg3" value="True" />
+    <param name="bdg4" value="True" /> 
+    <param name="bdg5" value="True" />
+    <param name="bdg6" value="True" /> 
+    <param name="bdg7" value="True" />
+    <output name="output_1">
+      <assert_contents>
+	<has_line line="Values are bdg1= changed bdg2= False when_unchanged if_False else bdg3= True when_true if_True if_bdg3 bdg4= True when_unchanged if_True if_bdg4 bgd5= True when_true 5checked bdg6= True when_true 6checked bdg7= True when_true 7checked" />
+      </assert_contents>
+    </output>
+  </test>
+    <test>
+    <!-- #6: Set by value -->
+    <param name="bdg1" value="changed" /> <!--Note does not change value -->
+    <param name="bdg2" value="changed" /> <!--Note does not change value -->
+    <param name="bdg4" value="changed" /> <!--Note does change value -->
+    <output name="output_1">
+      <assert_contents>
+	<has_line line="Values are bdg1= unchanged bdg2= False when_unchanged if_False else bdg3= False when_false if_False else bdg4= False when_changed if_False else bgd5= True when_true 5checked bdg6= False when_false bdg7= True when_true 7checked" />
+      </assert_contents>
+    </output>
+  </test>
+  <test>
+    <!-- #7: Setting with dot name does not work -->
+    <param name="bdg_options2.bdg2" value="True" /> 
+    <param name="bdg_options3.bdg3" value="True" />
+    <param name="bdg_options4.bdg4" value="False" /> 
+    <param name="bdg_options5.bdg5" value="False" />
+    <param name="bdg_options6.bdg6" value="True" /> 
+    <param name="bdg_options7.bdg7" value="False" />
+    <output name="output_1">
+      <assert_contents>
+	<has_line line="Values are bdg1= unchanged bdg2= False when_unchanged if_False else bdg3= False when_false if_False else bdg4= True when_unchanged if_True if_bdg4 bgd5= True when_true 5checked bdg6= False when_false bdg7= True when_true 7checked" />
+      </assert_contents>
+    </output>
+  </test>
+
+  </tests>
+</tool>
