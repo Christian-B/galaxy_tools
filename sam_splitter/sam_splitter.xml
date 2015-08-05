@@ -1,0 +1,46 @@
+<tool id="brenninc_sam_splitter" name="Split a Sam file by chrom" version="0.1.beta">
+    <description>Create one sam file for each chrom value found in the original</description>
+    <requirements>
+        <requirement type="package" version="0.6.1">htseq</requirement>
+        <requirement type="package" version="0.1.19">samtools</requirement>
+        <requirement type="package" version="0.7.7">pysam</requirement>
+    </requirements>
+    <command interpreter="python">split.py $input $report</command>
+    <inputs>
+        <param format="sam" name="input" type="data" label="Sam file"/>
+    </inputs>
+    <outputs>
+        <data format="txt" name="report">
+            <discover_datasets pattern="(?P&lt;designation&gt;\w+)\.sam" ext="sam" visible="true" />
+        </data>
+    </outputs>
+    <tests>
+        <!-- Requires 
+            Htseg to have been installed from the toolshed
+            planemo flag tool_dependency_dir=???/galaxy/dependency_dir/ # to point to where it was installed 
+            planmeo flag dependency_resolvers_config_file=???/galaxy/config/dependency_resolvers_config.xml # to find it
+        -->
+        <test>
+            <param name="input" value="mini.sam"/>
+            <output name="report" file="mini_report.txt">
+                <discovered_dataset designation="chr1" ftype="sam" file="chr1.sam" />
+                <discovered_dataset designation="chr1_gl000191_random" ftype="sam" file="chr1_gl000191_random.sam" />
+                <discovered_dataset designation="chrX" ftype="sam" file="chrX.sam" />
+                <discovered_dataset designation="unaligned" ftype="sam" file="unaligned.sam" />
+            </output>
+        </test>
+        <test>
+            <param name="input" value="mini_pure.sam"/>
+            <output name="report" file="mini_pure_report.txt">
+                <discovered_dataset designation="chr1" ftype="sam" file="chr1.sam" />
+                <discovered_dataset designation="chr1_gl000191_random" ftype="sam" file="chr1_gl000191_random.sam" />
+                <discovered_dataset designation="chrX" ftype="sam" file="chrX.sam" />
+            </output>
+        </test>
+    </tests>
+    <help>
+This tool will split the sam file into small sam files. Where each of the smaller files will contain just the allignments for a single chrom value.
+    </help>
+    <citations>
+    </citations>
+</tool>

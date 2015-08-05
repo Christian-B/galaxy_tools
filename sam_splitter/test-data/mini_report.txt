@@ -1,0 +1,4 @@
+chr1  5
+chr1_gl000191_random  1
+chrX  4
+unaligned  2
