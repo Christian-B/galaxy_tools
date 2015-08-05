@@ -1,0 +1,21 @@
+<tool id="brenninc_sam_copy" name="Sam_Copy" description="Copies sam files" version="0.1.0">
+  <command>
+    echo "This is the report" > $report;
+    cat $input > MAPPED.sam;
+    cat $input > UNMAPPED.sam;
+    cat $input > Chr2UNMAPPED.sam;
+    cat $input > Chr2_234_UNMAPPED.sam;
+  </command>
+  <inputs>
+    <param name="num_param" type="integer" value="7" />
+    <param format="sam" name="input" type="data" label="Source file"/>
+  </inputs>
+  <outputs>
+    <data format="txt" name="report">
+      <discover_datasets pattern="(?P&lt;designation&gt;([A-Z-])\w+)\.sam" ext="sam" visible="true" />
+      <!--discover_datasets pattern="(?P&lt;designation&gt;([A-Z-])\w+)\.sam" ext="sam" visible="true" /-->
+    </data>
+  </outputs>
+  <tests>
+  </tests>
+</tool>
