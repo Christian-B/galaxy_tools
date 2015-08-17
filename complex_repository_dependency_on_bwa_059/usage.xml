@@ -1,0 +1,25 @@
+<!-- Inspired by from https://wiki.galaxyproject.org/ComplexRepositoryDependencies
+-->
+<tool id="bwa_test" name="bwa_test" version="0.1.beta">
+  <requirements>
+    <requirement type="package" version="0.5.9">bwa</requirement>
+  </requirements>  <description>test bwa is installed</description>
+  <stdio>
+    <exit_code range="0"   level="fatal"   description="Oops there should have been an error" />
+    <exit_code range="2:255:"  level="fatal"   description="Not the expected error 1" />
+  </stdio>
+  <command>
+    bwa > $output
+  </command>
+  <outputs>
+    <data format="tabular" name="output" />
+  </outputs>
+
+  <tests>
+  </tests>
+
+  <help>
+Purely a test and may not work!
+  </help>
+
+</tool>

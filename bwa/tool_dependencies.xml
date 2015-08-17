@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!-- copied from https://wiki.galaxyproject.org/ComplexRepositoryDependencies
+                 https://testtoolshed.g2.bx.psu.edu/repository?repository_id=a041b331babfb419 
+-->                 
+<tool_dependency>
+    <package name="bwa" version="0.5.9">
+        <install version="1.0">
+            <actions>
+                <action type="download_by_url">http://downloads.sourceforge.net/project/bio-bwa/bwa-0.5.9.tar.bz2</action>
+                <action type="shell_command">make clean</action>
+                <action type="shell_command">make</action>
+                <action type="move_file">
+                    <source>bwa</source>
+                    <destination>$INSTALL_DIR/bin</destination>
+                </action>
+                <action type="set_environment">
+                    <environment_variable name="PATH" action="prepend_to">$INSTALL_DIR/bin</environment_variable>
+                </action>
+            </actions>
+        </install>
+        <readme>
+Compiling BWA requires zlib and libpthread to be present on your system.
+        </readme>
+    </package>
+</tool_dependency>

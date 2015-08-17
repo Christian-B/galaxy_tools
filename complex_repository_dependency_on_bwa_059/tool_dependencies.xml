@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<tool_dependency>
+    <package name="bwa" version="0.5.9">
+        <repository toolshed="http://l-unxx4770.it.manchester.ac.uk:9009/" name="bwa_059" owner="brenninc" changeset_revision="a5bb30a8da40" />
+    </package>
+</tool_dependency>
