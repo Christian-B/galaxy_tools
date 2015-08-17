@@ -1,0 +1,22 @@
+<!-- Inspired by from https://wiki.galaxyproject.org/ComplexRepositoryDependencies
+-->
+<tool id="r_version" name="r_version" version="0.1.beta">
+  <requirements>
+    <requirement type="package" version="3.1.2">R</requirement>
+  </requirements>  
+  <description>test R is installed</description>
+  <command>
+    ./R --version > $output
+  </command>
+  <outputs>
+    <data format="tabular" name="output" />
+  </outputs>
+
+  <tests>
+  </tests>
+
+  <help>
+Purely a test and may not work!
+  </help>
+
+</tool>

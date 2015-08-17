@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<tool_dependency>
+    <!--copied from https://toolshed.g2.bx.psu.edu/view/iuc/package_r_3_1_2/9f2fddb9d6e2 -->
+    <package name="R" version="3.1.2">
+        <install version="1.0">
+            <actions_group>
+                <actions architecture="x86_64" os="linux">
+                    <action type="download_by_url">https://depot.galaxyproject.org/package/linux/x86_64/R/R-3.1.2-Linux-x84_64.tgz</action>
+                    <action type="move_directory_files">
+                        <source_directory>.</source_directory>
+                        <destination_directory>$INSTALL_DIR</destination_directory>
+                    </action>
+                    <action type="set_environment">
+                        <environment_variable action="set_to" name="TCL_LIBRARY">$INSTALL_DIR/lib/libtcl8.4.so</environment_variable>
+                        <environment_variable action="set_to" name="TK_LIBRARY">$INSTALL_DIR/lib/libtk8.4.so</environment_variable>
+                        <environment_variable name="PATH" action="prepend_to">$INSTALL_DIR/bin</environment_variable>
+                    </action>
+                </actions>
+            </actions_group>
+        </install>
+        <readme>
+                The precompiled versions of this package were built 2014-12-21.
+                R is a free software environment for statistical computing and graphics.
+                NOTE: See custom compilation options above.
+        </readme>
+    </package>
+</tool_dependency>
+
