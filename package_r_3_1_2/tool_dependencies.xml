@@ -11,9 +11,10 @@
                         <destination_directory>$INSTALL_DIR</destination_directory>
                     </action>
                     <action type="set_environment">
+                        <environment_variable action="set_to" name="R_ROOT_DIR">$INSTALL_DIR</environment_variable>
+                        <environment_variable action="prepend_to" name="PATH">$INSTALL_DIR/lib/R/bin</environment_variable>
                         <environment_variable action="set_to" name="TCL_LIBRARY">$INSTALL_DIR/lib/libtcl8.4.so</environment_variable>
                         <environment_variable action="set_to" name="TK_LIBRARY">$INSTALL_DIR/lib/libtk8.4.so</environment_variable>
-                        <environment_variable name="PATH" action="prepend_to">$INSTALL_DIR/bin</environment_variable>
                     </action>
                 </actions>
             </actions_group>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <tool_dependency>
     <package name="R" version="3.1.2">
-        <repository toolshed="http://l-unxx4770.it.manchester.ac.uk:9009/" name="package_r_3_1_2" owner="brenninc" changeset_revision="66e79ac309e1" />
+        <repository toolshed="http://l-unxx4770.it.manchester.ac.uk:9009/" name="package_r_3_1_2" owner="brenninc" changeset_revision="dcb7ccefcb4e" />
     </package>
 </tool_dependency>
