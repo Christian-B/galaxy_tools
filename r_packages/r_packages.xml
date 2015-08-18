@@ -1,0 +1,22 @@
+<!-- Inspired by from https://wiki.galaxyproject.org/ComplexRepositoryDependencies
+-->
+<tool id="brenninc_r_packages" name="r_packages" version="0.1.beta">
+  <requirements>
+    <requirement type="package" version="3.1.2">R</requirement>
+  </requirements>  
+  <description>Lists packages installed into R</description>
+  <command   interpreter="bash">
+    r_wrapper.sh $__tool_directory__/packages.R $output
+  </command>
+  <outputs>
+    <data format="tabular" name="output" />
+  </outputs>
+
+  <tests>
+  </tests>
+
+  <help>
+Purely a test and may not work!
+  </help>
+
+</tool>
