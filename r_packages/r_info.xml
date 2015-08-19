@@ -1,0 +1,25 @@
+<tool id="brenninc_r_info" name="r_info" version="0.1.beta">
+  <requirements>
+    <requirement type="package" version="3.1.2">R</requirement>
+  </requirements>  
+  <description>Lists packages installed into R</description>
+  <command   interpreter="bash">
+    r_info.sh $__tool_directory__/packages.R $packages $version
+  </command>
+  <outputs>
+    <data format="tabular" name="packages" label="Installed R Packages"/>
+    <data format="tabular" name="version" label="R Version output"/>
+  </outputs>
+
+  <tests>
+  </tests>
+
+  <help>
+<![CDATA[
+This is a verification tool to see exactly which R this galaxy server is using.
+
+It will outout the R version info and the R packages installed.
+    ]]>
+  </help>
+
+</tool>
